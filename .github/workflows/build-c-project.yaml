@@ -68,8 +68,8 @@ jobs:
 
       - name: Clone ScreenLister dependency
         run: |
-          git clone https://github.com/starik222/ScreenLister.git ../ScreenLister
-          cd ../ScreenLister
+          git clone https://github.com/starik222/ScreenLister.git ScreenLister
+          cd ScreenLister
           git checkout master
 
       - name: Setup .NET 8
@@ -82,7 +82,7 @@ jobs:
 
       - name: Build ScreenLister
         run: |
-          msbuild ../ScreenLister/ScreenList/ScreenList.csproj `
+          msbuild ScreenLister/ScreenList/ScreenListerNET.csproj `
             /p:Configuration=Release `
             /p:Platform="Any CPU" `
             /t:Build `
