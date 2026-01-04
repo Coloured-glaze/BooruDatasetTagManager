@@ -23,13 +23,19 @@ on:
       self_contained:
         description: 'Build self-contained executable'
         required: true
+        type: choice
+        options:
+          - 'true'
+          - 'false'
         default: 'true'
-        type: string
       create_release:
         description: 'Create a GitHub release after build'
         required: true
+        type: choice
         default: 'false'
-        type: string
+        options:
+          - 'true'
+          - 'false'
       release_tag:
         description: 'Release tag (required if create_release is true)'
         required: false
@@ -75,7 +81,7 @@ jobs:
         run: |
           msbuild BooruDatasetTagManager.sln `
             /p:Configuration=${{ inputs.configuration }} `
-            /p:Platform=Any CPU `
+            /p:Platform="Any CPU" `
             /t:Build `
             /v:minimal
 
