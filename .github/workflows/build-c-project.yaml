@@ -66,6 +66,12 @@ jobs:
         with:
           submodules: "recursive"
 
+      - name: Clone ScreenLister dependency
+        run: |
+          git clone https://github.com/starik222/ScreenLister.git ../ScreenLister
+          cd ../ScreenLister
+          git checkout master
+
       - name: Setup .NET 8
         uses: actions/setup-dotnet@v4
         with:
@@ -73,6 +79,14 @@ jobs:
 
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
+
+      - name: Build ScreenLister
+        run: |
+          msbuild ../ScreenLister/ScreenList/ScreenList.csproj `
+            /p:Configuration=Release `
+            /p:Platform="Any CPU" `
+            /t:Build `
+            /v:minimal
 
       - name: Restore dependencies
         run: dotnet restore BooruDatasetTagManager.sln
