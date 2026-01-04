@@ -6,11 +6,10 @@ on:
       dotnet_version:
         description: '.NET version'
         required: true
-        default: '6.0.x'
+        default: '8.0.x'
         type: choice
         options:
           - '8.0.x'
-          - '6.0.x'
       configuration:
         description: 'Build configuration'
         required: true
@@ -91,7 +90,15 @@ jobs:
       - name: Restore ScreenLister dependencies
         run: dotnet restore ScreenLister/ScreenList/ScreenListerNET.csproj
 
-      - name: Build ScreenLister
+      - name: Build ScreenLister C++ Project
+        run: |
+          msbuild ScreenLister/ScreenLister/ScreenLister.vcxproj `
+            /p:Configuration=Release `
+            /p:Platform=x64 `
+            /t:Build `
+            /v:minimal
+
+      - name: Build ScreenLister .NET Project
         run: |
           msbuild ScreenLister/ScreenList/ScreenListerNET.csproj `
             /p:Configuration=Release `
@@ -101,6 +108,36 @@ jobs:
             /t:Build `
             /v:minimal
 
+      - name: Verify ScreenLister DLLs
+        shell: powershell
+        run: |
+          Write-Host "=== Checking ScreenLister DLLs ==="
+          
+          $managedDllPath = "ScreenLister\ScreenList\bin\Release\net6.0-windows\ScreenListerNET.dll"
+          $nativeDllPath = "ScreenLister\ScreenLister\x64\Release\ScreenLister.dll"
+          
+          if (Test-Path $managedDllPath) {
+            Write-Host "[OK] Managed DLL found: $managedDllPath"
+            Write-Host "  File size: $((Get-Item $managedDllPath).Length) bytes"
+          } else {
+            Write-Host "[X] Managed DLL NOT found at: $managedDllPath"
+            exit 1
+          }
+          
+          if (Test-Path $nativeDllPath) {
+            Write-Host "[OK] Native DLL found: $nativeDllPath"
+            Write-Host "  File size: $((Get-Item $nativeDllPath).Length) bytes"
+          } else {
+            Write-Host "[X] Native DLL NOT found at: $nativeDllPath"
+            exit 1
+          }
+          
+          Write-Host "=== Copying native DLL to win-x64 folder ==="
+          $targetDir = "ScreenLister\ScreenList\bin\Release\net6.0-windows\win-x64"
+          New-Item -ItemType Directory -Force -Path $targetDir | Out-Null
+          Copy-Item -Path $nativeDllPath -Destination "$targetDir\ScreenLister.dll" -Force
+          Write-Host "[OK] Native DLL copied to: $targetDir\ScreenLister.dll"
+
       - name: Restore dependencies
         run: dotnet restore BooruDatasetTagManager.sln
 
@@ -109,7 +146,7 @@ jobs:
           msbuild BooruDatasetTagManager.sln `
             /p:Configuration=${{ inputs.configuration }} `
             /p:Platform="Any CPU" `
-            /p:TargetFramework=net6.0-windows `
+            /p:TargetFramework=net8.0-windows `
             /t:Build `
             /v:minimal
 
