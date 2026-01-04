@@ -63,8 +63,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
-        with:
-          submodules: "recursive"
+        # with:
+        #   submodules: "recursive"
 
       - name: Clone ScreenLister dependency
         run: |
