@@ -73,11 +73,11 @@ jobs:
         # with:
         #   submodules: "recursive"
 
-      - name: Clone ScreenLister dependency
-        run: |
-          git clone https://github.com/starik222/ScreenLister.git ScreenLister
-          cd ScreenLister
-          git checkout master
+      # - name: Clone ScreenLister dependency
+      #   run: |
+          # git clone https://github.com/starik222/ScreenLister.git ScreenLister
+          # cd ScreenLister
+          # git checkout master
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
