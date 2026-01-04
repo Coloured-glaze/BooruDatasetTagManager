@@ -101,6 +101,7 @@ jobs:
           msbuild BooruDatasetTagManager.sln `
             /p:Configuration=${{ inputs.configuration }} `
             /p:Platform="Any CPU" `
+            /p:TargetFramework=net8.0-windows `
             /t:Build `
             /v:minimal
 
