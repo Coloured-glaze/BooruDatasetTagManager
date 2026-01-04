@@ -88,6 +88,8 @@ jobs:
           msbuild ScreenLister/ScreenList/ScreenListerNET.csproj `
             /p:Configuration=Release `
             /p:Platform="Any CPU" `
+            /p:TargetFramework=net6.0-windows `
+            /p:OutputPath=bin\Release\net6.0-windows\ `
             /t:Build `
             /v:minimal
 
