@@ -151,8 +151,9 @@ jobs:
             /v:minimal
 
       - name: Publish application
+        shell: powershell
         run: |
-          $selfContained = if ("${{ inputs.self_contained }}" -eq "true") { "--self-contained true" } else { "--self-contained false" }
+          $selfContained = if ("${{ inputs.self_contained }}" -eq "true") { "--self-contained" } else { "--no-self-contained" }
           dotnet publish BooruDatasetTagManager/BooruDatasetTagManager.csproj `
             --configuration ${{ inputs.configuration }} `
             --runtime ${{ inputs.runtime }} `
