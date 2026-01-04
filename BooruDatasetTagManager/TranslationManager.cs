@@ -19,6 +19,7 @@ namespace BooruDatasetTagManager
         private AbstractTranslator translator;
         private string translationFilePath;
         private HashSet<long> _hashSet;
+        private Dictionary<long, string> _translationDict;
         private bool _offlineMode;
         private bool _isCsvFormat;
 
@@ -28,6 +29,7 @@ namespace BooruDatasetTagManager
             _workDir = workDir;
             Translations = new List<TransItem>();
             _hashSet = new HashSet<long>();
+            _translationDict = new Dictionary<long, string>();
             _offlineMode = offlineMode;
             translator = AbstractTranslator.Create(service);
             if (!string.IsNullOrEmpty(customTranslationFile) && File.Exists(customTranslationFile))
@@ -67,12 +69,17 @@ namespace BooruDatasetTagManager
                 {
                     Translations.Add(transItem);
                     _hashSet.Add(transItem.OrigHash);
+                    _translationDict[transItem.OrigHash] = transItem.Trans;
                 }
             }
         }
 
         public bool Contains(string orig)
         {
+            if (_isCsvFormat)
+            {
+                orig = orig.Replace(" ", "_");
+            }
             return _hashSet.Contains(orig.ToLower().GetHash());
         }
 
@@ -83,15 +90,21 @@ namespace BooruDatasetTagManager
 
         public string GetTranslation(string text)
         {
+            if (_isCsvFormat)
+            {
+                text = text.Replace(" ", "_");
+            }
             return GetTranslation(text.ToLower().Trim().GetHash());
         }
 
         public string GetTranslation(long hash)
         {
-            var res = Translations.FirstOrDefault(a => a.OrigHash == hash);
-            if (res == null)
-                return null;
-            return res.Trans;
+            string result;
+            if (_translationDict.TryGetValue(hash, out result))
+            {
+                return result;
+            }
+            return null;
         }
 
         public string GetTranslation(long hash, bool onlyManual)
@@ -104,8 +117,14 @@ namespace BooruDatasetTagManager
                 return res.Trans;
             }
             else
-                return GetTranslation(hash);
-
+            {
+                string result;
+                if (_translationDict.TryGetValue(hash, out result))
+                {
+                    return result;
+                }
+                return null;
+            }
         }
 
         public async Task<string> GetTranslationAsync(string text)
@@ -117,6 +136,10 @@ namespace BooruDatasetTagManager
         }
         public void AddTranslation(string orig, string trans, bool isManual)
         {
+            if (_isCsvFormat)
+            {
+                orig = orig.Replace(" ", "_");
+            }
             string line;
             if (_isCsvFormat)
             {
@@ -130,6 +153,7 @@ namespace BooruDatasetTagManager
             var newItem = new TransItem(orig, trans, isManual);
             Translations.Add(newItem);
             _hashSet.Add(newItem.OrigHash);
+            _translationDict[newItem.OrigHash] = trans;
         }
 
         public async Task AddTranslationAsync(string orig, string trans, bool isManual)
@@ -149,6 +173,7 @@ namespace BooruDatasetTagManager
             var newItem = new TransItem(orig, trans, isManual);
             Translations.Add(newItem);
             _hashSet.Add(newItem.OrigHash);
+            _translationDict[newItem.OrigHash] = trans;
         }
 
         public async Task<string> TranslateAsync(string text)
@@ -172,7 +197,12 @@ namespace BooruDatasetTagManager
                 return string.Empty;
             }
             
-            result = await translator.TranslateAsync(text, "en", _language);
+            string originalText = text;
+            if (_isCsvFormat)
+            {
+                text = text.Replace(" ", "_");
+            }
+            result = await translator.TranslateAsync(originalText, "en", _language);
             if (!string.IsNullOrEmpty(result))
                 await AddTranslationAsync(text, result, false);
             Program.TranslationLocker.Release();

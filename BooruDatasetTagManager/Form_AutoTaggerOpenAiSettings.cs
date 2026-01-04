@@ -59,7 +59,10 @@ namespace BooruDatasetTagManager
                     Controls.RemoveByKey("errorLabel");
                 }
                 connectRechecker.Stop();
-                Form_AutoTaggerOpenAiSettings_Load(sender, e);
+                if (!isClosing)
+                {
+                    Form_AutoTaggerOpenAiSettings_Load(sender, e);
+                }
             }
         }
 
