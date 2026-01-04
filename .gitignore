@@ -365,3 +365,5 @@ FodyWeavers.xsd
 # Interrogator binaries
 /interrogator_rpc/build
 /interrogator_rpc/dist
+
+.github/workflows/build-*cuda*.yaml

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -63,7 +63,7 @@ namespace BooruDatasetTagManager
                     string translationsDir = Path.Combine(Application.StartupPath, "Translations");
                     if (!Directory.Exists(translationsDir))
                         Directory.CreateDirectory(translationsDir);
-                    TransManager = new TranslationManager(Program.Settings.TranslationLanguage, Program.Settings.TransService, translationsDir);
+                    TransManager = new TranslationManager(Program.Settings.TranslationLanguage, Program.Settings.TransService, translationsDir, Program.Settings.OfflineTranslationMode, Program.Settings.TranslationFilePath);
                     TransManager.LoadTranslations();
                     string tagsDir = Path.Combine(Application.StartupPath, "Tags");
                     if(!Directory.Exists(tagsDir))

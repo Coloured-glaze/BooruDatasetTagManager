@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -48,6 +48,8 @@ namespace BooruDatasetTagManager
             CheckAskChange.Checked = Program.Settings.AskSaveChanges;
             checkBoxFixOnLoad.Checked = Program.Settings.FixTagsOnSaveLoad;
             AutoSortCheckBox.Checked = Program.Settings.AutoSort;
+            checkBoxOfflineMode.Checked = Program.Settings.OfflineTranslationMode;
+            textBoxTranslationFile.Text = Program.Settings.TranslationFilePath;
             //UI
             checkBoxCacheImages.Checked = Program.Settings.CacheOpenImages;
             numericUpDown3.Value = Program.Settings.GridViewRowHeight;
@@ -112,6 +114,8 @@ namespace BooruDatasetTagManager
             Program.Settings.CaptionFileExtensions = textBox4.Text;
             Program.Settings.AskSaveChanges = CheckAskChange.Checked;
             Program.Settings.AutoSort = AutoSortCheckBox.Checked;
+            Program.Settings.OfflineTranslationMode = checkBoxOfflineMode.Checked;
+            Program.Settings.TranslationFilePath = textBoxTranslationFile.Text;
             //UI
             Program.Settings.CacheOpenImages = checkBoxCacheImages.Checked;
             Program.Settings.GridViewRowHeight = (int)numericUpDown3.Value;
@@ -156,6 +160,16 @@ namespace BooruDatasetTagManager
             }
 
             Program.Settings.SaveSettings();
+            
+            if (Program.TransManager != null)
+            {
+                string translationsDir = Path.Combine(Application.StartupPath, "Translations");
+                if (!Directory.Exists(translationsDir))
+                    Directory.CreateDirectory(translationsDir);
+                Program.TransManager = new TranslationManager(Program.Settings.TranslationLanguage, Program.Settings.TransService, translationsDir, Program.Settings.OfflineTranslationMode, Program.Settings.TranslationFilePath);
+                Program.TransManager.LoadTranslations();
+            }
+            
             DialogResult = DialogResult.OK;
         }
 
@@ -223,6 +237,8 @@ namespace BooruDatasetTagManager
             labelTransLang.Text = I18n.GetText("SettingTranslationLang");
             labelTranslService.Text = I18n.GetText("SettingTranslationSrv");
             checkBoxLoadOnlyManual.Text = I18n.GetText("SettingLoadOnlyManualAutocomplete");
+            checkBoxOfflineMode.Text = I18n.GetText("SettingOfflineMode");
+            labelTranslationFile.Text = I18n.GetText("SettingTranslationFile");
             checkBoxCacheImages.Text = I18n.GetText("SettingsCheckBoxCacheImages");
             LabelApApiEndpoint.Text = I18n.GetText("SettingsInterrogatorAddress");
             labelOpenAiEndpoint.Text = I18n.GetText("SettingsInterrogatorAddress");
@@ -266,6 +282,18 @@ namespace BooruDatasetTagManager
         private void checkBoxCustomPrompt_CheckedChanged(object sender, EventArgs e)
         {
             textBoxCustomPrompt.Enabled = checkBoxCustomPrompt.Checked;
+        }
+
+        private void ButtonBrowseTranslationFile_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*";
+            openFileDialog.Title = "Select translation file";
+            
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                textBoxTranslationFile.Text = openFileDialog.FileName;
+            }
         }
     }
 }

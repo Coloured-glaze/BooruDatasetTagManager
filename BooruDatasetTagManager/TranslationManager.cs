@@ -18,14 +18,25 @@ namespace BooruDatasetTagManager
         public List<TransItem> Translations { get; set; }
         private AbstractTranslator translator;
         private string translationFilePath;
+        private HashSet<long> _hashSet;
+        private bool _offlineMode;
 
-        public TranslationManager(string toLang, TranslationService service, string workDir)
+        public TranslationManager(string toLang, TranslationService service, string workDir, bool offlineMode = false, string customTranslationFile = "")
         {
             _language = toLang;
             _workDir = workDir;
             Translations = new List<TransItem>();
+            _hashSet = new HashSet<long>();
+            _offlineMode = offlineMode;
             translator = AbstractTranslator.Create(service);
-            translationFilePath = Path.Combine(_workDir, _language + ".txt");
+            if (!string.IsNullOrEmpty(customTranslationFile) && File.Exists(customTranslationFile))
+            {
+                translationFilePath = customTranslationFile;
+            }
+            else
+            {
+                translationFilePath = Path.Combine(_workDir, _language + ".txt");
+            }
         }
 
         public void LoadTranslations()
@@ -43,21 +54,22 @@ namespace BooruDatasetTagManager
                 if (item.Trim().StartsWith("//"))
                     continue;
                 var transItem = TransItem.Create(item);
-                if (transItem != null && !Contains(transItem.OrigHash))
+                if (transItem != null && !_hashSet.Contains(transItem.OrigHash))
                 {
                     Translations.Add(transItem);
+                    _hashSet.Add(transItem.OrigHash);
                 }
             }
         }
 
         public bool Contains(string orig)
         {
-            return Translations.Exists(a => a.OrigHash == orig.ToLower().GetHash());
+            return _hashSet.Contains(orig.ToLower().GetHash());
         }
 
         public bool Contains(long hash)
         {
-            return Translations.Exists(a => a.OrigHash == hash);
+            return _hashSet.Contains(hash);
         }
 
         public string GetTranslation(string text)
@@ -97,7 +109,9 @@ namespace BooruDatasetTagManager
         public void AddTranslation(string orig, string trans, bool isManual)
         {
             File.AppendAllText(translationFilePath, $"{orig}={trans}\r\n", Encoding.UTF8);
-            Translations.Add(new TransItem(orig, trans, isManual));
+            var newItem = new TransItem(orig, trans, isManual);
+            Translations.Add(newItem);
+            _hashSet.Add(newItem.OrigHash);
         }
 
         public async Task AddTranslationAsync(string orig, string trans, bool isManual)
@@ -105,7 +119,9 @@ namespace BooruDatasetTagManager
             StreamWriter sw = new StreamWriter(translationFilePath, true, Encoding.UTF8);
             await sw.WriteLineAsync($"{(isManual ? "*" : "")}{orig}={trans}");
             sw.Close();
-            Translations.Add(new TransItem(orig, trans, isManual));
+            var newItem = new TransItem(orig, trans, isManual);
+            Translations.Add(newItem);
+            _hashSet.Add(newItem.OrigHash);
         }
 
         public async Task<string> TranslateAsync(string text)
@@ -122,6 +138,13 @@ namespace BooruDatasetTagManager
                 Program.TranslationLocker.Release();
                 return result;
             }
+            
+            if (_offlineMode)
+            {
+                Program.TranslationLocker.Release();
+                return string.Empty;
+            }
+            
             result = await translator.TranslateAsync(text, "en", _language);
             if (!string.IsNullOrEmpty(result))
                 await AddTranslationAsync(text, result, false);

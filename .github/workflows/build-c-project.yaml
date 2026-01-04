@@ -1,0 +1,164 @@
+name: Build .NET 8 Project
+
+on:
+  workflow_dispatch:
+    inputs:
+      configuration:
+        description: 'Build configuration'
+        required: true
+        default: 'Release'
+        type: choice
+        options:
+          - Debug
+          - Release
+      runtime:
+        description: 'Target runtime'
+        required: true
+        default: 'win-x64'
+        type: choice
+        options:
+          - win-x64
+          - win-x86
+          - win-arm64
+      self_contained:
+        description: 'Build self-contained executable'
+        required: true
+        default: 'true'
+        type: string
+      create_release:
+        description: 'Create a GitHub release after build'
+        required: true
+        default: 'false'
+        type: string
+      release_tag:
+        description: 'Release tag (required if create_release is true)'
+        required: false
+        default: ''
+        type: string
+      release_name:
+        description: 'Release name'
+        required: false
+        default: 'BooruDatasetTagManager Release'
+        type: string
+      release_notes:
+        description: 'Release notes'
+        required: false
+        default: 'Automated release from GitHub Actions'
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build ${{ inputs.configuration }} ${{ inputs.runtime }}
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          submodules: "recursive"
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Restore dependencies
+        run: dotnet restore BooruDatasetTagManager.sln
+
+      - name: Build Solution
+        run: |
+          msbuild BooruDatasetTagManager.sln `
+            /p:Configuration=${{ inputs.configuration }} `
+            /p:Platform=Any CPU `
+            /t:Build `
+            /v:minimal
+
+      - name: Publish application
+        run: |
+          $selfContained = if ("${{ inputs.self_contained }}" -eq "true") { "--self-contained true" } else { "--self-contained false" }
+          dotnet publish BooruDatasetTagManager/BooruDatasetTagManager.csproj `
+            --configuration ${{ inputs.configuration }} `
+            --runtime ${{ inputs.runtime }} `
+            $selfContained `
+            --output publish `
+            /p:PublishSingleFile=true `
+            /p:EnableCompressionInSingleFile=true
+
+      - name: List published files
+        shell: powershell
+        run: |
+          Write-Host "=== Published Files ==="
+          Get-ChildItem -Path publish -Recurse -File | ForEach-Object {
+            Write-Host "$($_.FullName) - $($_.Length) bytes"
+          }
+
+      - name: Create Release Archive
+        if: inputs.create_release == 'true'
+        shell: powershell
+        run: |
+          $config = "${{ inputs.configuration }}"
+          $runtime = "${{ inputs.runtime }}"
+          $archiveName = "BooruDatasetTagManager-${config}-${runtime}.zip"
+          
+          Write-Host "Creating release archive: $archiveName"
+          
+          # Create archive with all published files
+          Compress-Archive -Path "publish\*" -DestinationPath $archiveName -Force
+          
+          Write-Host "Archive created successfully"
+          Write-Host "Archive contents:"
+          Get-ChildItem -Path publish -Recurse -File | ForEach-Object {
+            Write-Host "  $($_.Name)"
+          }
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ inputs.configuration }}-${{ inputs.runtime }}
+          path: publish/
+          retention-days: 30
+
+      - name: Upload Release Archive
+        if: inputs.create_release == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-archive-${{ inputs.configuration }}-${{ inputs.runtime }}
+          path: BooruDatasetTagManager-${{ inputs.configuration }}-${{ inputs.runtime }}.zip
+          retention-days: 30
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    if: inputs.create_release == 'true'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Display structure of downloaded files
+        run: ls -R artifacts
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.release_tag }}
+          name: ${{ inputs.release_name }}
+          body: ${{ inputs.release_notes }}
+          draft: false
+          prerelease: false
+          files: |
+            artifacts/release-archive-*/BooruDatasetTagManager-*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -17,6 +17,8 @@ namespace BooruDatasetTagManager
         public List<LanguageItem> AvaibleLanguages;
         public TranslationService TransService { get; set; } = TranslationService.GoogleTranslate;
         public bool OnlyManualTransInAutocomplete { get; set; } = false;
+        public bool OfflineTranslationMode { get; set; } = false;
+        public string TranslationFilePath { get; set; } = "";
         public AutocompleteMode AutocompleteMode { get; set; } = AutocompleteMode.StartWith;
         public AutocompleteSort AutocompleteSort { get; set; } = AutocompleteSort.Alphabetical;
         public bool FixTagsOnSaveLoad { get; set; } = true;
@@ -108,6 +110,8 @@ namespace BooruDatasetTagManager
                 PreviewSize = tempSettings.PreviewSize;
                 TransService = tempSettings.TransService;
                 OnlyManualTransInAutocomplete = tempSettings.OnlyManualTransInAutocomplete;
+                OfflineTranslationMode = tempSettings.OfflineTranslationMode;
+                TranslationFilePath = tempSettings.TranslationFilePath;
                 AutocompleteMode = tempSettings.AutocompleteMode;
                 AutocompleteSort = tempSettings.AutocompleteSort;
                 FixTagsOnSaveLoad = tempSettings.FixTagsOnSaveLoad;

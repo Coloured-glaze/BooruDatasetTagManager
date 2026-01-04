@@ -1,4 +1,4 @@
-﻿
+
 namespace BooruDatasetTagManager
 {
     partial class Form_settings
@@ -62,6 +62,10 @@ namespace BooruDatasetTagManager
             checkBoxLoadOnlyManual = new System.Windows.Forms.CheckBox();
             labelTranslService = new System.Windows.Forms.Label();
             comboBox2 = new System.Windows.Forms.ComboBox();
+            checkBoxOfflineMode = new System.Windows.Forms.CheckBox();
+            labelTranslationFile = new System.Windows.Forms.Label();
+            textBoxTranslationFile = new System.Windows.Forms.TextBox();
+            buttonBrowseTranslationFile = new System.Windows.Forms.Button();
             labelHotkeysHelp = new System.Windows.Forms.Label();
             dataGridViewHotkeys = new System.Windows.Forms.DataGridView();
             CmdId = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -400,6 +404,46 @@ namespace BooruDatasetTagManager
             checkBoxLoadOnlyManual.Text = "Load only manual translations into autocomplete";
             checkBoxLoadOnlyManual.UseVisualStyleBackColor = true;
             // 
+            // checkBoxOfflineMode
+            // 
+            checkBoxOfflineMode.AutoSize = true;
+            checkBoxOfflineMode.Location = new System.Drawing.Point(13, 104);
+            checkBoxOfflineMode.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            checkBoxOfflineMode.Name = "checkBoxOfflineMode";
+            checkBoxOfflineMode.Size = new System.Drawing.Size(286, 19);
+            checkBoxOfflineMode.TabIndex = 3;
+            checkBoxOfflineMode.Text = "Offline translation mode";
+            checkBoxOfflineMode.UseVisualStyleBackColor = true;
+            // 
+            // labelTranslationFile
+            // 
+            labelTranslationFile.AutoSize = true;
+            labelTranslationFile.Location = new System.Drawing.Point(13, 133);
+            labelTranslationFile.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            labelTranslationFile.Name = "labelTranslationFile";
+            labelTranslationFile.Size = new System.Drawing.Size(103, 15);
+            labelTranslationFile.TabIndex = 4;
+            labelTranslationFile.Text = "Translation file";
+            // 
+            // textBoxTranslationFile
+            // 
+            textBoxTranslationFile.Location = new System.Drawing.Point(13, 152);
+            textBoxTranslationFile.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            textBoxTranslationFile.Name = "textBoxTranslationFile";
+            textBoxTranslationFile.Size = new System.Drawing.Size(388, 23);
+            textBoxTranslationFile.TabIndex = 5;
+            // 
+            // buttonBrowseTranslationFile
+            // 
+            buttonBrowseTranslationFile.Location = new System.Drawing.Point(407, 152);
+            buttonBrowseTranslationFile.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            buttonBrowseTranslationFile.Name = "buttonBrowseTranslationFile";
+            buttonBrowseTranslationFile.Size = new System.Drawing.Size(75, 23);
+            buttonBrowseTranslationFile.TabIndex = 6;
+            buttonBrowseTranslationFile.Text = "Browse...";
+            buttonBrowseTranslationFile.UseVisualStyleBackColor = true;
+            buttonBrowseTranslationFile.Click += ButtonBrowseTranslationFile_Click;
+            // 
             // labelTranslService
             // 
             labelTranslService.AutoSize = true;
@@ -630,6 +674,10 @@ namespace BooruDatasetTagManager
             // tabTranslations
             // 
             tabTranslations.Controls.Add(checkBoxLoadOnlyManual);
+            tabTranslations.Controls.Add(checkBoxOfflineMode);
+            tabTranslations.Controls.Add(labelTranslationFile);
+            tabTranslations.Controls.Add(textBoxTranslationFile);
+            tabTranslations.Controls.Add(buttonBrowseTranslationFile);
             tabTranslations.Controls.Add(labelTransLang);
             tabTranslations.Controls.Add(labelTranslService);
             tabTranslations.Controls.Add(comboBox1);
@@ -824,6 +872,10 @@ namespace BooruDatasetTagManager
         private System.Windows.Forms.Label labelTranslService;
         private System.Windows.Forms.ComboBox comboBox2;
         private System.Windows.Forms.CheckBox checkBoxLoadOnlyManual;
+        private System.Windows.Forms.CheckBox checkBoxOfflineMode;
+        private System.Windows.Forms.Label labelTranslationFile;
+        private System.Windows.Forms.TextBox textBoxTranslationFile;
+        private System.Windows.Forms.Button buttonBrowseTranslationFile;
         private System.Windows.Forms.ComboBox comboAutocompMode;
         private System.Windows.Forms.Label LabelAutocompMode;
         private System.Windows.Forms.ComboBox comboAutocompSort;
