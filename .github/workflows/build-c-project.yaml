@@ -1,8 +1,16 @@
-name: Build .NET 8 Project
+name: Build .NET Project
 
 on:
   workflow_dispatch:
     inputs:
+      dotnet_version:
+        description: '.NET version'
+        required: true
+        default: '6.0.x'
+        type: choice
+        options:
+          - '8.0.x'
+          - '6.0.x'
       configuration:
         description: 'Build configuration'
         required: true
@@ -72,10 +80,10 @@ jobs:
           cd ScreenLister
           git checkout master
 
-      - name: Setup .NET 8
+      - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: ${{ inputs.dotnet_version }}
 
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
@@ -89,196 +97,19 @@ jobs:
             /p:Configuration=Release `
             /p:Platform="Any CPU" `
             /p:TargetFramework=net6.0-windows `
+            /p:OutputPath=bin\Release\net6.0-windows\ `
             /t:Build `
             /v:minimal
 
-      - name: Check ScreenLister build output
-        shell: powershell
-        run: |
-          Write-Host "=== ScreenLister Directory Structure ==="
-          Get-ChildItem -Path ScreenLister -Recurse -File | ForEach-Object {
-            Write-Host "$($_.FullName)"
-          }
-          Write-Host ""
-          Write-Host "=== Check for ScreenListerNET.dll ==="
-          $dllPath1 = "ScreenLister\ScreenList\bin\Release\net6.0-windows\ScreenListerNET.dll"
-          $dllPath2 = "ScreenLister\ScreenList\bin\Release\ScreenListerNET.dll"
-          $dllPath3 = "ScreenLister\ScreenList\bin\Any CPU\Release\net6.0-windows\ScreenListerNET.dll"
-          
-          if (Test-Path $dllPath1) {
-            Write-Host "[OK] DLL found at: $dllPath1"
-            Get-Item $dllPath1 | Select-Object Name, Length, LastWriteTime
-          } else {
-            Write-Host "[NOT FOUND] DLL NOT found at: $dllPath1"
-          }
-          
-          if (Test-Path $dllPath2) {
-            Write-Host "[OK] DLL found at: $dllPath2"
-            Get-Item $dllPath2 | Select-Object Name, Length, LastWriteTime
-          } else {
-            Write-Host "[NOT FOUND] DLL NOT found at: $dllPath2"
-          }
-          
-          if (Test-Path $dllPath3) {
-            Write-Host "[OK] DLL found at: $dllPath3"
-            Get-Item $dllPath3 | Select-Object Name, Length, LastWriteTime
-          } else {
-            Write-Host "[NOT FOUND] DLL NOT found at: $dllPath3"
-          }
-          
-          Write-Host ""
-          Write-Host "=== Searching for all ScreenListerNET.dll files ==="
-          Get-ChildItem -Path . -Recurse -Filter "ScreenListerNET.dll" -ErrorAction SilentlyContinue | ForEach-Object {
-            Write-Host "Found: $($_.FullName)"
-          }
-
       - name: Restore dependencies
         run: dotnet restore BooruDatasetTagManager.sln
-
-      - name: Test DLL loading
-        shell: powershell
-        run: |
-          Write-Host "=== Testing ScreenListerNET.dll loading ==="
-          $dllPath = "ScreenLister\ScreenList\bin\Release\net6.0-windows\ScreenListerNET.dll"
-          
-          if (Test-Path $dllPath) {
-            Write-Host "DLL found at: $dllPath"
-            
-            # Try to load with .NET 8 runtime
-            Write-Host ""
-            Write-Host "=== Attempting to load with .NET 8 runtime ==="
-            try {
-              $assembly = [System.Reflection.Assembly]::LoadFrom($dllPath)
-              Write-Host "[OK] Assembly loaded successfully"
-              Write-Host "Full Name: $($assembly.FullName)"
-              Write-Host "Location: $($assembly.Location)"
-              
-              Write-Host ""
-              Write-Host "=== Checking for ScreenLister namespace ==="
-              $types = $assembly.GetTypes()
-              $screenListerTypes = $types | Where-Object { $_.Namespace -eq "ScreenLister" }
-              if ($screenListerTypes) {
-                Write-Host "[OK] Found $($screenListerTypes.Count) types in ScreenLister namespace:"
-                $screenListerTypes | ForEach-Object { Write-Host "  - $($_.FullName)" }
-              } else {
-                Write-Host "[ERROR] No types found in ScreenLister namespace"
-                Write-Host "Available namespaces:"
-                $types | Select-Object -ExpandProperty Namespace -Unique | ForEach-Object { Write-Host "  - $_" }
-              }
-            } catch {
-              Write-Host "[ERROR] Failed to load assembly: $($_.Exception.Message)"
-              Write-Host "Stack Trace: $($_.Exception.StackTrace)"
-            }
-          } else {
-            Write-Host "[ERROR] DLL not found at: $dllPath"
-          }
-
-      - name: Check project references
-        shell: powershell
-        run: |
-          Write-Host "=== Checking BooruDatasetTagManager.csproj references ==="
-          $csprojPath = "BooruDatasetTagManager\BooruDatasetTagManager.csproj"
-          $content = Get-Content $csprojPath -Raw
-          if ($content -match "ScreenListerNET") {
-            Write-Host "[OK] ScreenListerNET reference found in project file"
-            if ($content -match "HintPath.*ScreenLister") {
-              Write-Host "[OK] HintPath found"
-              if ($content -match "HintPath.*?>([^<]+)") {
-                $hintPath = $matches[1]
-                Write-Host "  HintPath: $hintPath"
-                $fullPath = Join-Path (Get-Location) $hintPath
-                Write-Host "  Full path: $fullPath"
-                if (Test-Path $fullPath) {
-                  Write-Host "  [OK] DLL exists at HintPath location"
-                } else {
-                  Write-Host "  [NOT FOUND] DLL does NOT exist at HintPath location"
-                }
-              }
-            }
-          } else {
-            Write-Host "[NOT FOUND] ScreenListerNET reference NOT found in project file"
-          }
-
-      - name: Copy ScreenLister DLL to expected location
-        shell: powershell
-        run: |
-          Write-Host "=== Copying ScreenLister DLL ==="
-          $sourcePath = "ScreenLister\ScreenList\bin\Any CPU\Release\net6.0-windows\ScreenListerNET.dll"
-          $targetDir = "ScreenLister\ScreenList\bin\Release\net6.0-windows"
-          $targetPath = Join-Path $targetDir "ScreenListerNET.dll"
-          
-          if (Test-Path $sourcePath) {
-            Write-Host "Source DLL found at: $sourcePath"
-            
-            # Ensure target directory exists
-            if (-not (Test-Path $targetDir)) {
-              Write-Host "Creating target directory: $targetDir"
-              New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
-            }
-            
-            # Copy DLL
-            Copy-Item -Path $sourcePath -Destination $targetPath -Force
-            Write-Host "[OK] DLL copied to: $targetPath"
-            
-            # Verify copy
-            if (Test-Path $targetPath) {
-              Write-Host "[OK] Copy verified"
-              Get-Item $targetPath | Select-Object Name, Length, LastWriteTime
-            } else {
-              Write-Host "[ERROR] Copy failed"
-            }
-            
-            # Copy all DLLs from source directory
-            Write-Host ""
-            Write-Host "=== Copying all dependencies ==="
-            $sourceDir = "ScreenLister\ScreenList\bin\Any CPU\Release\net6.0-windows"
-            Get-ChildItem -Path $sourceDir -Filter "*.dll" | ForEach-Object {
-              Copy-Item -Path $_.FullName -Destination $targetDir -Force
-              Write-Host "Copied: $($_.Name)"
-            }
-          } else {
-            Write-Host "[ERROR] Source DLL not found at: $sourcePath"
-          }
-
-      - name: Check DLL dependencies
-        shell: powershell
-        run: |
-          Write-Host "=== Checking ScreenListerNET.dll dependencies ==="
-          $dllPath = "ScreenLister\ScreenList\bin\Release\net6.0-windows\ScreenListerNET.dll"
-          if (Test-Path $dllPath) {
-            Write-Host "DLL exists at: $dllPath"
-            Write-Host ""
-            Write-Host "=== All DLLs in target directory ==="
-            Get-ChildItem -Path "ScreenLister\ScreenList\bin\Release\net6.0-windows" -Filter "*.dll" | ForEach-Object {
-              Write-Host "$($_.Name) - $($_.Length) bytes"
-            }
-            
-            Write-Host ""
-            Write-Host "=== Checking DLL with reflection ==="
-            try {
-              $assembly = [System.Reflection.Assembly]::LoadFrom($dllPath)
-              Write-Host "Assembly loaded successfully"
-              Write-Host "Full Name: $($assembly.FullName)"
-              Write-Host ""
-              Write-Host "=== Referenced Assemblies ==="
-              $assembly.GetReferencedAssemblies() | ForEach-Object {
-                Write-Host "$($_.Name) - $($_.Version)"
-              }
-            } catch {
-              Write-Host "[ERROR] Failed to load assembly: $($_.Exception.Message)"
-            }
-          } else {
-            Write-Host "[ERROR] DLL not found"
-          }
 
       - name: Build Solution
         run: |
           msbuild BooruDatasetTagManager.sln `
             /p:Configuration=${{ inputs.configuration }} `
             /p:Platform="Any CPU" `
-            /p:TargetFramework=net8.0-windows `
-            /p:CheckForOverflowUnderflow=false `
-            /p:ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch=None `
+            /p:TargetFramework=net6.0-windows `
             /t:Build `
             /v:minimal
 
