@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,6 +20,7 @@ namespace BooruDatasetTagManager
         private string translationFilePath;
         private HashSet<long> _hashSet;
         private bool _offlineMode;
+        private bool _isCsvFormat;
 
         public TranslationManager(string toLang, TranslationService service, string workDir, bool offlineMode = false, string customTranslationFile = "")
         {
@@ -37,6 +38,7 @@ namespace BooruDatasetTagManager
             {
                 translationFilePath = Path.Combine(_workDir, _language + ".txt");
             }
+            _isCsvFormat = Path.GetExtension(translationFilePath).Equals(".csv", StringComparison.OrdinalIgnoreCase);
         }
 
         public void LoadTranslations()
@@ -44,7 +46,14 @@ namespace BooruDatasetTagManager
             if (!File.Exists(translationFilePath))
             {
                 var sw = File.CreateText(translationFilePath);
-                sw.WriteLine("//Translation format: <original>=<translation>");
+                if (_isCsvFormat)
+                {
+                    sw.WriteLine("//Translation format: <original>,<translation>");
+                }
+                else
+                {
+                    sw.WriteLine("//Translation format: <original>=<translation>");
+                }
                 sw.Dispose();
                 return;
             }
@@ -53,7 +62,7 @@ namespace BooruDatasetTagManager
             {
                 if (item.Trim().StartsWith("//"))
                     continue;
-                var transItem = TransItem.Create(item);
+                var transItem = TransItem.Create(item, _isCsvFormat);
                 if (transItem != null && !_hashSet.Contains(transItem.OrigHash))
                 {
                     Translations.Add(transItem);
@@ -108,7 +117,16 @@ namespace BooruDatasetTagManager
         }
         public void AddTranslation(string orig, string trans, bool isManual)
         {
-            File.AppendAllText(translationFilePath, $"{orig}={trans}\r\n", Encoding.UTF8);
+            string line;
+            if (_isCsvFormat)
+            {
+                line = $"{(isManual ? "*" : "")}{orig},{trans}";
+            }
+            else
+            {
+                line = $"{orig}={trans}";
+            }
+            File.AppendAllText(translationFilePath, line + "\r\n", Encoding.UTF8);
             var newItem = new TransItem(orig, trans, isManual);
             Translations.Add(newItem);
             _hashSet.Add(newItem.OrigHash);
@@ -117,7 +135,16 @@ namespace BooruDatasetTagManager
         public async Task AddTranslationAsync(string orig, string trans, bool isManual)
         {
             StreamWriter sw = new StreamWriter(translationFilePath, true, Encoding.UTF8);
-            await sw.WriteLineAsync($"{(isManual ? "*" : "")}{orig}={trans}");
+            string line;
+            if (_isCsvFormat)
+            {
+                line = $"{(isManual ? "*" : "")}{orig},{trans}";
+            }
+            else
+            {
+                line = $"{(isManual ? "*" : "")}{orig}={trans}";
+            }
+            await sw.WriteLineAsync(line);
             sw.Close();
             var newItem = new TransItem(orig, trans, isManual);
             Translations.Add(newItem);
@@ -168,7 +195,7 @@ namespace BooruDatasetTagManager
                 IsManual = isManual;
             }
 
-            public static TransItem Create(string text)
+            public static TransItem Create(string text, bool isCsvFormat = false)
             {
                 bool manual = false;
                 if (text.StartsWith("*"))
@@ -176,7 +203,15 @@ namespace BooruDatasetTagManager
                     text = text.Substring(1);
                     manual = true;
                 }
-                int index = text.LastIndexOf('=');
+                int index;
+                if (isCsvFormat)
+                {
+                    index = text.LastIndexOf(',');
+                }
+                else
+                {
+                    index = text.LastIndexOf('=');
+                }
                 if (index == -1)
                     return null;
                 string orig = text.Substring(0, index).Trim();

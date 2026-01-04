@@ -288,7 +288,7 @@ namespace BooruDatasetTagManager
         private void ButtonBrowseTranslationFile_Click(object sender, EventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*";
+            openFileDialog.Filter = "Translation files (*.txt;*.csv)|*.txt;*.csv|Text files (*.txt)|*.txt|CSV files (*.csv)|*.csv|All files (*.*)|*.*";
             openFileDialog.Title = "Select translation file";
             
             if (openFileDialog.ShowDialog() == DialogResult.OK)

@@ -125,12 +125,7 @@ All language files are located in the `Languages` ​​folder. You can translat
 
 # Build
 
-This is a tool designed in C and you will need to run it in Visual Studio (not Visual Studio Code). Steps to achieve this are:
-1. Download [visual Studio](https://visualstudio.microsoft.com/downloads/)
-2. Clone this repo into a folder somewhere on your computer
-3. Open the repo using Visual Studio: `File` > `Open` > `Project/Solution` > select the `BooruDatasetTagManager.sln` file
-4. Build the solution by selecting `Build` > `Build Solution` from the menu (or by pressing Ctrl+Shift+B.
-Run the Application)
+You can download the latest release from the [GitHub Actions](./actions) page. Navigate to the "Actions" tab and select the latest workflow run to download the built artifacts.
 
 # Other
 

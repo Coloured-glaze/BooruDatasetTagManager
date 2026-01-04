@@ -1,4 +1,4 @@
-﻿using BooruDatasetTagManager.AiApi;
+using BooruDatasetTagManager.AiApi;
 using BooruDatasetTagManager.Properties;
 using System;
 using System.Collections.Generic;
@@ -1194,7 +1194,7 @@ namespace BooruDatasetTagManager
             SetFilter();
         }
 
-        private void gridViewTags_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        private async void gridViewTags_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
             if (gridViewTags.Columns["ImageTags"].Index == e.ColumnIndex && e.RowIndex != -1)
             {
@@ -1213,6 +1213,10 @@ namespace BooruDatasetTagManager
                             }));
 
                         }
+                    }
+                    if (isTranslate && gridViewTags.Columns.Contains("Translation"))
+                    {
+                        gridViewTags["Translation", e.RowIndex].Value = await Program.TransManager.TranslateAsync(editedValue);
                     }
                 }
                 else if (gridViewDS.SelectedRows.Count > 1)

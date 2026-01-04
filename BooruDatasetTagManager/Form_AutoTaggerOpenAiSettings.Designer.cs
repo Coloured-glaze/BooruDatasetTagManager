@@ -1,4 +1,4 @@
-﻿namespace BooruDatasetTagManager
+namespace BooruDatasetTagManager
 {
     partial class Form_AutoTaggerOpenAiSettings
     {
@@ -476,6 +476,7 @@
             StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             Text = "Form_AutoTaggerOpenAiSettings";
             Load += Form_AutoTaggerOpenAiSettings_Load;
+            FormClosing += Form_AutoTaggerOpenAiSettings_FormClosing;
             OpenAiRequestSettingsTabs.ResumeLayout(false);
             tabRequest.ResumeLayout(false);
             tabRequest.PerformLayout();

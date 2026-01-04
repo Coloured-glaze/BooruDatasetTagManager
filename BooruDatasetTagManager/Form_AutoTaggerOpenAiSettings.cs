@@ -1,4 +1,4 @@
-﻿using BooruDatasetTagManager.AiApi;
+using BooruDatasetTagManager.AiApi;
 using BooruDatasetTagManager.Properties;
 using System;
 using System.Collections.Generic;
@@ -15,6 +15,7 @@ namespace BooruDatasetTagManager
 {
     public partial class Form_AutoTaggerOpenAiSettings : Form
     {
+        private bool isClosing = false;
         public Form_AutoTaggerOpenAiSettings()
         {
             InitializeComponent();
@@ -46,7 +47,11 @@ namespace BooruDatasetTagManager
 
         private async void ConnectRechecker_Tick(object sender, EventArgs e)
         {
+            if (isClosing)
+                return;
             var connetionResult = await Program.OpenAiAutoTagger.ConnectAsync();
+            if (isClosing)
+                return;
             if (connetionResult.Result)
             {
                 if (Controls.ContainsKey("errorLabel"))
@@ -258,6 +263,17 @@ namespace BooruDatasetTagManager
         private void trackBarVideoFrameScale_ValueChanged(object sender, EventArgs e)
         {
             labelVideoFrameScaleValue.Text = (100 - trackBarVideoFrameScale.Value).ToString();
+        }
+
+        private void Form_AutoTaggerOpenAiSettings_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            isClosing = true;
+            if (connectRechecker != null && connectRechecker.Enabled)
+                connectRechecker.Stop();
+            if (Controls.ContainsKey("errorLabel"))
+            {
+                Controls.RemoveByKey("errorLabel");
+            }
         }
     }
 }
