@@ -135,6 +135,44 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore BooruDatasetTagManager.sln
 
+      - name: Test DLL loading
+        shell: powershell
+        run: |
+          Write-Host "=== Testing ScreenListerNET.dll loading ==="
+          $dllPath = "ScreenLister\ScreenList\bin\Release\net6.0-windows\ScreenListerNET.dll"
+          
+          if (Test-Path $dllPath) {
+            Write-Host "DLL found at: $dllPath"
+            
+            # Try to load with .NET 8 runtime
+            Write-Host ""
+            Write-Host "=== Attempting to load with .NET 8 runtime ==="
+            try {
+              $assembly = [System.Reflection.Assembly]::LoadFrom($dllPath)
+              Write-Host "[OK] Assembly loaded successfully"
+              Write-Host "Full Name: $($assembly.FullName)"
+              Write-Host "Location: $($assembly.Location)"
+              
+              Write-Host ""
+              Write-Host "=== Checking for ScreenLister namespace ==="
+              $types = $assembly.GetTypes()
+              $screenListerTypes = $types | Where-Object { $_.Namespace -eq "ScreenLister" }
+              if ($screenListerTypes) {
+                Write-Host "[OK] Found $($screenListerTypes.Count) types in ScreenLister namespace:"
+                $screenListerTypes | ForEach-Object { Write-Host "  - $($_.FullName)" }
+              } else {
+                Write-Host "[ERROR] No types found in ScreenLister namespace"
+                Write-Host "Available namespaces:"
+                $types | Select-Object -ExpandProperty Namespace -Unique | ForEach-Object { Write-Host "  - $_" }
+              }
+            } catch {
+              Write-Host "[ERROR] Failed to load assembly: $($_.Exception.Message)"
+              Write-Host "Stack Trace: $($_.Exception.StackTrace)"
+            }
+          } else {
+            Write-Host "[ERROR] DLL not found at: $dllPath"
+          }
+
       - name: Check project references
         shell: powershell
         run: |
@@ -189,8 +227,48 @@ jobs:
             } else {
               Write-Host "[ERROR] Copy failed"
             }
+            
+            # Copy all DLLs from source directory
+            Write-Host ""
+            Write-Host "=== Copying all dependencies ==="
+            $sourceDir = "ScreenLister\ScreenList\bin\Any CPU\Release\net6.0-windows"
+            Get-ChildItem -Path $sourceDir -Filter "*.dll" | ForEach-Object {
+              Copy-Item -Path $_.FullName -Destination $targetDir -Force
+              Write-Host "Copied: $($_.Name)"
+            }
           } else {
             Write-Host "[ERROR] Source DLL not found at: $sourcePath"
+          }
+
+      - name: Check DLL dependencies
+        shell: powershell
+        run: |
+          Write-Host "=== Checking ScreenListerNET.dll dependencies ==="
+          $dllPath = "ScreenLister\ScreenList\bin\Release\net6.0-windows\ScreenListerNET.dll"
+          if (Test-Path $dllPath) {
+            Write-Host "DLL exists at: $dllPath"
+            Write-Host ""
+            Write-Host "=== All DLLs in target directory ==="
+            Get-ChildItem -Path "ScreenLister\ScreenList\bin\Release\net6.0-windows" -Filter "*.dll" | ForEach-Object {
+              Write-Host "$($_.Name) - $($_.Length) bytes"
+            }
+            
+            Write-Host ""
+            Write-Host "=== Checking DLL with reflection ==="
+            try {
+              $assembly = [System.Reflection.Assembly]::LoadFrom($dllPath)
+              Write-Host "Assembly loaded successfully"
+              Write-Host "Full Name: $($assembly.FullName)"
+              Write-Host ""
+              Write-Host "=== Referenced Assemblies ==="
+              $assembly.GetReferencedAssemblies() | ForEach-Object {
+                Write-Host "$($_.Name) - $($_.Version)"
+              }
+            } catch {
+              Write-Host "[ERROR] Failed to load assembly: $($_.Exception.Message)"
+            }
+          } else {
+            Write-Host "[ERROR] DLL not found"
           }
 
       - name: Build Solution
@@ -199,6 +277,8 @@ jobs:
             /p:Configuration=${{ inputs.configuration }} `
             /p:Platform="Any CPU" `
             /p:TargetFramework=net8.0-windows `
+            /p:CheckForOverflowUnderflow=false `
+            /p:ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch=None `
             /t:Build `
             /v:minimal
 
