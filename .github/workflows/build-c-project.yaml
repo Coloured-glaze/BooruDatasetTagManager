@@ -80,6 +80,9 @@ jobs:
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
 
+      - name: Restore ScreenLister dependencies
+        run: dotnet restore ScreenLister/ScreenList/ScreenListerNET.csproj
+
       - name: Build ScreenLister
         run: |
           msbuild ScreenLister/ScreenList/ScreenListerNET.csproj `
