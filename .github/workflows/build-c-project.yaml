@@ -103,19 +103,27 @@ jobs:
           Write-Host "=== Check for ScreenListerNET.dll ==="
           $dllPath1 = "ScreenLister\ScreenList\bin\Release\net6.0-windows\ScreenListerNET.dll"
           $dllPath2 = "ScreenLister\ScreenList\bin\Release\ScreenListerNET.dll"
+          $dllPath3 = "ScreenLister\ScreenList\bin\Any CPU\Release\net6.0-windows\ScreenListerNET.dll"
           
           if (Test-Path $dllPath1) {
-            Write-Host "✓ DLL found at: $dllPath1"
+            Write-Host "[OK] DLL found at: $dllPath1"
             Get-Item $dllPath1 | Select-Object Name, Length, LastWriteTime
           } else {
-            Write-Host "✗ DLL NOT found at: $dllPath1"
+            Write-Host "[NOT FOUND] DLL NOT found at: $dllPath1"
           }
           
           if (Test-Path $dllPath2) {
-            Write-Host "✓ DLL found at: $dllPath2"
+            Write-Host "[OK] DLL found at: $dllPath2"
             Get-Item $dllPath2 | Select-Object Name, Length, LastWriteTime
           } else {
-            Write-Host "✗ DLL NOT found at: $dllPath2"
+            Write-Host "[NOT FOUND] DLL NOT found at: $dllPath2"
+          }
+          
+          if (Test-Path $dllPath3) {
+            Write-Host "[OK] DLL found at: $dllPath3"
+            Get-Item $dllPath3 | Select-Object Name, Length, LastWriteTime
+          } else {
+            Write-Host "[NOT FOUND] DLL NOT found at: $dllPath3"
           }
           
           Write-Host ""
@@ -134,30 +142,30 @@ jobs:
           $csprojPath = "BooruDatasetTagManager\BooruDatasetTagManager.csproj"
           $content = Get-Content $csprojPath -Raw
           if ($content -match "ScreenListerNET") {
-            Write-Host "✓ ScreenListerNET reference found in project file"
+            Write-Host "[OK] ScreenListerNET reference found in project file"
             if ($content -match "HintPath.*ScreenLister") {
-              Write-Host "✓ HintPath found"
+              Write-Host "[OK] HintPath found"
               if ($content -match "HintPath.*?>([^<]+)") {
                 $hintPath = $matches[1]
                 Write-Host "  HintPath: $hintPath"
                 $fullPath = Join-Path (Get-Location) $hintPath
                 Write-Host "  Full path: $fullPath"
                 if (Test-Path $fullPath) {
-                  Write-Host "  ✓ DLL exists at HintPath location"
+                  Write-Host "  [OK] DLL exists at HintPath location"
                 } else {
-                  Write-Host "  ✗ DLL does NOT exist at HintPath location"
+                  Write-Host "  [NOT FOUND] DLL does NOT exist at HintPath location"
                 }
               }
             }
           } else {
-            Write-Host "✗ ScreenListerNET reference NOT found in project file"
+            Write-Host "[NOT FOUND] ScreenListerNET reference NOT found in project file"
           }
 
       - name: Copy ScreenLister DLL to expected location
         shell: powershell
         run: |
           Write-Host "=== Copying ScreenLister DLL ==="
-          $sourcePath = "ScreenLister\ScreenList\bin\Release\net6.0-windows\ScreenListerNET.dll"
+          $sourcePath = "ScreenLister\ScreenList\bin\Any CPU\Release\net6.0-windows\ScreenListerNET.dll"
           $targetDir = "ScreenLister\ScreenList\bin\Release\net6.0-windows"
           $targetPath = Join-Path $targetDir "ScreenListerNET.dll"
           
@@ -172,17 +180,17 @@ jobs:
             
             # Copy DLL
             Copy-Item -Path $sourcePath -Destination $targetPath -Force
-            Write-Host "✓ DLL copied to: $targetPath"
+            Write-Host "[OK] DLL copied to: $targetPath"
             
             # Verify copy
             if (Test-Path $targetPath) {
-              Write-Host "✓ Copy verified"
+              Write-Host "[OK] Copy verified"
               Get-Item $targetPath | Select-Object Name, Length, LastWriteTime
             } else {
-              Write-Host "✗ Copy failed"
+              Write-Host "[ERROR] Copy failed"
             }
           } else {
-            Write-Host "✗ Source DLL not found at: $sourcePath"
+            Write-Host "[ERROR] Source DLL not found at: $sourcePath"
           }
 
       - name: Build Solution
