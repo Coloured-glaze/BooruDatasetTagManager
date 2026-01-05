@@ -229,9 +229,26 @@ namespace BooruDatasetTagManager
         public void LoadTranslation(TranslationManager transManager)
         {
             bool onlyManual = Program.Settings.OnlyManualTransInAutocomplete;
+            
+            var translationCache = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var transItem in transManager.Translations)
+            {
+                if (!onlyManual || transItem.IsManual == onlyManual)
+                {
+                    translationCache[transItem.Orig] = transItem.Trans;
+                }
+            }
+            
             foreach (var tag in Tags)
             {
-                tag.Translation = transManager.GetTranslation(tag.Tag, onlyManual);
+                if (translationCache.TryGetValue(tag.Tag, out var translation))
+                {
+                    tag.Translation = translation;
+                }
+                else
+                {
+                    tag.Translation = null;
+                }
             }
         }
 
