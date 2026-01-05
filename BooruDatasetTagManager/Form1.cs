@@ -103,6 +103,7 @@ namespace BooruDatasetTagManager
                 Program.TagsList.LoadTranslation(Program.TransManager);
                 
                 Program.DataManager.AllTags.Clear();
+                var allTagItems = new List<AllTagsItem>();
                 foreach (var tag in Program.TagsList.Tags)
                 {
                     if (!tag.IsAlias)
@@ -110,9 +111,10 @@ namespace BooruDatasetTagManager
                         var allTagItem = new AllTagsItem(tag.Tag);
                         allTagItem.Count = tag.Count;
                         allTagItem.SetTranslation(tag.Translation);
-                        Program.DataManager.AllTags.AddItem(allTagItem);
+                        allTagItems.Add(allTagItem);
                     }
                 }
+                Program.DataManager.AllTags.AddRange(allTagItems);
             });
         }
 

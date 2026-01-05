@@ -148,6 +148,17 @@ namespace BooruDatasetTagManager
             List.Add(item);
         }
 
+        public void AddRange(IEnumerable<AllTagsItem> items)
+        {
+            foreach (var item in items)
+            {
+                item.Parent = this;
+                tagsList.Add(item);
+                List.Add(item);
+            }
+            OnListChanged(resetEvent);
+        }
+
         public string[] GetAllTagsList()
         {
             return tagsList.Select(x => x.Tag).ToArray();
