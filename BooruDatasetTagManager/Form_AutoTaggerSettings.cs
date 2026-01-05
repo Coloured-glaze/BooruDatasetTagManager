@@ -62,6 +62,8 @@ namespace BooruDatasetTagManager
 
         private async void Form_AutoTaggerSettings_Load(object sender, EventArgs e)
         {
+            if (isClosing)
+                return;
             pictureBox1.BackColor = checkedListBoxcomboBoxInterrogators.SupportedVideoColor;
             pictureBox2.BackColor = checkedListBoxcomboBoxInterrogators.NotSupportedVideoColor;
             button1.Enabled = false;
@@ -70,6 +72,8 @@ namespace BooruDatasetTagManager
 
                 if (!await Program.AutoTagger.ConnectAsync())
                 {
+                    if (isClosing)
+                        return;
                     Label errLabel = new Label();
                     errLabel.Name = "errorLabel";
                     errLabel.Text = I18n.GetText("TipAutoTagUnableConnect");
@@ -82,6 +86,8 @@ namespace BooruDatasetTagManager
                     connectRechecker.Start();
                 }
             }
+            if (isClosing)
+                return;
             if (Program.AutoTagger.IsConnected)
             {
                 checkedListBoxcomboBoxInterrogators.Items.AddRange(Program.AutoTagger.Config.Interrogators.ToArray());
@@ -148,7 +154,7 @@ namespace BooruDatasetTagManager
         private void Form_AutoTaggerSettings_FormClosing(object sender, FormClosingEventArgs e)
         {
             isClosing = true;
-            if (connectRechecker.Enabled)
+            if (connectRechecker != null && connectRechecker.Enabled)
                 connectRechecker.Stop();
             if (Controls.ContainsKey("errorLabel"))
             {

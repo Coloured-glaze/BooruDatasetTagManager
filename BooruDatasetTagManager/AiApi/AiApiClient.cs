@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -252,11 +252,12 @@ namespace BooruDatasetTagManager.AiApi
         {
             if (!defSettings || Program.Settings.AutoTagger.InterragatorParams.Count == 0)
             {
-                Form_AutoTaggerSettings autoTaggerSettings = new Form_AutoTaggerSettings();
-                if (autoTaggerSettings.ShowDialog() != DialogResult.OK || Program.Settings.AutoTagger.InterragatorParams.Count == 0)
+                using (Form_AutoTaggerSettings autoTaggerSettings = new Form_AutoTaggerSettings())
                 {
-                    autoTaggerSettings.Close();
-                    return (null, I18n.GetText("TipGenCancel"));
+                    if (autoTaggerSettings.ShowDialog() != DialogResult.OK || Program.Settings.AutoTagger.InterragatorParams.Count == 0)
+                    {
+                        return (null, I18n.GetText("TipGenCancel"));
+                    }
                 }
             }
             if (!Program.AutoTagger.IsConnected)

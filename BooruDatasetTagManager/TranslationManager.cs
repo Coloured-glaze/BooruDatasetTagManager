@@ -76,11 +76,7 @@ namespace BooruDatasetTagManager
 
         public bool Contains(string orig)
         {
-            if (_isCsvFormat)
-            {
-                orig = orig.Replace(" ", "_");
-            }
-            return _hashSet.Contains(orig.ToLower().GetHash());
+            return _hashSet.Contains(GetNormalizedHash(orig));
         }
 
         public bool Contains(long hash)
@@ -90,11 +86,7 @@ namespace BooruDatasetTagManager
 
         public string GetTranslation(string text)
         {
-            if (_isCsvFormat)
-            {
-                text = text.Replace(" ", "_");
-            }
-            return GetTranslation(text.ToLower().Trim().GetHash());
+            return GetTranslation(GetNormalizedHash(text));
         }
 
         public string GetTranslation(long hash)
@@ -134,23 +126,34 @@ namespace BooruDatasetTagManager
                 return GetTranslation(text);
             });
         }
-        public void AddTranslation(string orig, string trans, bool isManual)
+
+        private string GetNormalizedText(string text)
         {
             if (_isCsvFormat)
             {
-                orig = orig.Replace(" ", "_");
+                return text.Replace(" ", "_");
             }
+            return text;
+        }
+
+        private long GetNormalizedHash(string text)
+        {
+            return GetNormalizedText(text).ToLower().Trim().GetHash();
+        }
+        public void AddTranslation(string orig, string trans, bool isManual)
+        {
+            string normalizedOrig = GetNormalizedText(orig);
             string line;
             if (_isCsvFormat)
             {
-                line = $"{(isManual ? "*" : "")}{orig},{trans}";
+                line = $"{(isManual ? "*" : "")}{normalizedOrig},{trans}";
             }
             else
             {
                 line = $"{orig}={trans}";
             }
             File.AppendAllText(translationFilePath, line + "\r\n", Encoding.UTF8);
-            var newItem = new TransItem(orig, trans, isManual);
+            var newItem = new TransItem(normalizedOrig, trans, isManual);
             Translations.Add(newItem);
             _hashSet.Add(newItem.OrigHash);
             _translationDict[newItem.OrigHash] = trans;
@@ -158,11 +161,12 @@ namespace BooruDatasetTagManager
 
         public async Task AddTranslationAsync(string orig, string trans, bool isManual)
         {
+            string normalizedOrig = GetNormalizedText(orig);
             StreamWriter sw = new StreamWriter(translationFilePath, true, Encoding.UTF8);
             string line;
             if (_isCsvFormat)
             {
-                line = $"{(isManual ? "*" : "")}{orig},{trans}";
+                line = $"{(isManual ? "*" : "")}{normalizedOrig},{trans}";
             }
             else
             {
@@ -170,7 +174,7 @@ namespace BooruDatasetTagManager
             }
             await sw.WriteLineAsync(line);
             sw.Close();
-            var newItem = new TransItem(orig, trans, isManual);
+            var newItem = new TransItem(normalizedOrig, trans, isManual);
             Translations.Add(newItem);
             _hashSet.Add(newItem.OrigHash);
             _translationDict[newItem.OrigHash] = trans;
@@ -198,13 +202,10 @@ namespace BooruDatasetTagManager
             }
             
             string originalText = text;
-            if (_isCsvFormat)
-            {
-                text = text.Replace(" ", "_");
-            }
+            string normalizedText = GetNormalizedText(text);
             result = await translator.TranslateAsync(originalText, "en", _language);
             if (!string.IsNullOrEmpty(result))
-                await AddTranslationAsync(text, result, false);
+                await AddTranslationAsync(normalizedText, result, false);
             Program.TranslationLocker.Release();
             return result;
         }
@@ -246,6 +247,9 @@ namespace BooruDatasetTagManager
                     return null;
                 string orig = text.Substring(0, index).Trim();
                 string trans = text.Substring(index + 1).Trim();
+                
+                // 对于CSV格式，原始文本已经包含了下划线替换，所以不需要再次处理
+                // 对于TXT格式，保持原始文本不变
                 return new TransItem(orig, trans, manual);
             }
 

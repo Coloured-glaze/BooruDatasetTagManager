@@ -70,6 +70,8 @@ namespace BooruDatasetTagManager
 
         private async void Form_AutoTaggerOpenAiSettings_Load(object sender, EventArgs e)
         {
+            if (isClosing)
+                return;
             if (Program.OpenAiAutoTagger == null)
             {
                 MessageBox.Show(I18n.GetText("OpenAiTaggerInitError"), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -81,6 +83,8 @@ namespace BooruDatasetTagManager
                 var connectResult = await Program.OpenAiAutoTagger.ConnectAsync();
                 if (!connectResult.Result)
                 {
+                    if (isClosing)
+                        return;
                     Label errLabel = new Label();
                     errLabel.Name = "errorLabel";
                     errLabel.Text = connectResult.ErrMessage;
@@ -93,6 +97,8 @@ namespace BooruDatasetTagManager
                     connectRechecker.Start();
                 }
             }
+            if (isClosing)
+                return;
             if (Program.OpenAiAutoTagger.IsConnected)
             {
                 listBoxModels.Items.AddRange(Program.OpenAiAutoTagger.Models.ToArray());

@@ -125,7 +125,7 @@ All language files are located in the `Languages` ​​folder. You can translat
 
 # Build
 
-You can download the latest release from the [GitHub Actions](./actions) page. Navigate to the "Actions" tab and select the latest workflow run to download the built artifacts.
+You can download the latest release from the [GitHub Actions](https://github.com/Coloured-glaze/BooruDatasetTagManager/actions) page. Navigate to the "Actions" tab and select the latest workflow run to download the built artifacts.
 
 # Other
 

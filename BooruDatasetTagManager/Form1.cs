@@ -2133,7 +2133,12 @@ namespace BooruDatasetTagManager
                     taggerResult = await Program.OpenAiAutoTagger.GetTagsWithAutoTagger(item.ImageFilePath, defSettings);
 
                 if (!defSettings)
-                    defSettings = true;
+                {
+                    // 只有在用户成功保存设置后，才将defSettings设置为true
+                    // 如果用户取消了设置窗口，保持defSettings为false，以便下一张图片可以重新打开设置窗口
+                    if (taggerResult.data != null || string.IsNullOrEmpty(taggerResult.errorMessage))
+                        defSettings = true;
+                }
                 if (!string.IsNullOrEmpty(taggerResult.errorMessage))
                     SetStatus(taggerResult.errorMessage);
                 if (taggerResult.data != null)

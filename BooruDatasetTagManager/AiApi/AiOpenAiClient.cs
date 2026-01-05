@@ -1,4 +1,4 @@
-﻿using OpenAI;
+using OpenAI;
 using OpenAI.Chat;
 using OpenAI.Models;
 using System;
@@ -145,11 +145,12 @@ namespace BooruDatasetTagManager.AiApi
         {
             if (!defSettings || Program.OpenAiAutoTagger == null || string.IsNullOrEmpty(Program.Settings.OpenAiAutoTagger.Model))
             {
-                Form_AutoTaggerOpenAiSettings autoTaggerSettings = new Form_AutoTaggerOpenAiSettings();
-                if (autoTaggerSettings.ShowDialog() != DialogResult.OK || Program.OpenAiAutoTagger == null || string.IsNullOrEmpty(Program.Settings.OpenAiAutoTagger.Model))
+                using (Form_AutoTaggerOpenAiSettings autoTaggerSettings = new Form_AutoTaggerOpenAiSettings())
                 {
-                    autoTaggerSettings.Close();
-                    return (new List<AiApiClient.AutoTagItem>(), I18n.GetText("TipGenCancel"));
+                    if (autoTaggerSettings.ShowDialog() != DialogResult.OK || Program.OpenAiAutoTagger == null || string.IsNullOrEmpty(Program.Settings.OpenAiAutoTagger.Model))
+                    {
+                        return (new List<AiApiClient.AutoTagItem>(), I18n.GetText("TipGenCancel"));
+                    }
                 }
             }
             if (!Program.OpenAiAutoTagger.IsConnected)
