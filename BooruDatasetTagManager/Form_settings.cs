@@ -33,7 +33,6 @@ namespace BooruDatasetTagManager
             comboBox1.SelectedValue = Program.Settings.TranslationLanguage;
             checkBoxLoadOnlyManual.Checked = Program.Settings.OnlyManualTransInAutocomplete;
             checkBoxManualTagLoading.Checked = Program.Settings.ManualTagLoadingMode;
-            checkBoxLoadTranslationOnStartup.Checked = Program.Settings.LoadTranslationOnStartup;
             comboBox2.Items.AddRange(Extensions.GetFriendlyEnumValues<TranslationService>());
             comboBox2.SelectedIndex = Extensions.GetEnumIndexFromValue<TranslationService>(Program.Settings.TransService.ToString());
             comboAutocompMode.Items.AddRange(Extensions.GetFriendlyEnumValues<AutocompleteMode>());
@@ -109,7 +108,6 @@ namespace BooruDatasetTagManager
             Program.Settings.TransService = Extensions.GetEnumItemFromFriendlyText<TranslationService>(comboBox2.SelectedItem.ToString());
             Program.Settings.OnlyManualTransInAutocomplete = checkBoxLoadOnlyManual.Checked;
             Program.Settings.ManualTagLoadingMode = checkBoxManualTagLoading.Checked;
-            Program.Settings.LoadTranslationOnStartup = checkBoxLoadTranslationOnStartup.Checked;
             Program.Settings.AutocompleteMode = Extensions.GetEnumItemFromFriendlyText<AutocompleteMode>(comboAutocompMode.SelectedItem.ToString());
             Program.Settings.AutocompleteSort = Extensions.GetEnumItemFromFriendlyText<AutocompleteSort>(comboAutocompSort.SelectedItem.ToString());
             Program.Settings.FixTagsOnSaveLoad = checkBoxFixOnLoad.Checked;
@@ -304,69 +302,26 @@ namespace BooruDatasetTagManager
 
         private async void ButtonReloadTags_Click(object sender, EventArgs e)
         {
-            buttonReloadTags.Enabled = false;
-            buttonReloadTags.Text = "Loading...";
+            string tagsDir = Path.Combine(Application.StartupPath, "Tags");
+            if (!Directory.Exists(tagsDir))
+                Directory.CreateDirectory(tagsDir);
             
-            try
-            {
-                await Task.Run(() =>
-                {
-                    string tagsDir = Path.Combine(Application.StartupPath, "Tags");
-                    if (!Directory.Exists(tagsDir))
-                        Directory.CreateDirectory(tagsDir);
-                    
-                    string tagFile = Path.Combine(tagsDir, "List.tdb");
-                    
-                    if (Program.TagsList == null)
-                        Program.TagsList = new TagsDB();
-                    
-                    Program.TagsList.SetNeedFixTags(Program.Settings.FixTagsOnSaveLoad);
-                    Program.TagsList.ClearDb();
-                    Program.TagsList.ClearLoadedFiles();
-                    Program.TagsList.ResetVersion();
-                    Program.TagsList.LoadCSVFromDir(tagsDir);
-                    Program.TagsList.LoadTxtFromDir(tagsDir);
-                    Program.TagsList.SortTags();
-                    Program.TagsList.SaveTags(tagFile);
-                    Program.TagsList.LoadTranslation(Program.TransManager);
-                });
-                
-                MessageBox.Show("标签数据已重新加载");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("加载标签数据时出错: " + ex.Message);
-            }
-            finally
-            {
-                buttonReloadTags.Enabled = true;
-                buttonReloadTags.Text = "Reload tags from files";
-            }
-        }
-
-        private async void ButtonLoadTranslation_Click(object sender, EventArgs e)
-        {
-            buttonLoadTranslation.Enabled = false;
-            buttonLoadTranslation.Text = "Loading...";
+            string tagFile = Path.Combine(tagsDir, "List.tdb");
             
-            try
-            {
-                await Task.Run(() =>
-                {
-                    Program.TagsList.LoadTranslation(Program.TransManager);
-                });
-                
-                MessageBox.Show("翻译已加载");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("加载翻译时出错: " + ex.Message);
-            }
-            finally
-            {
-                buttonLoadTranslation.Enabled = true;
-                buttonLoadTranslation.Text = "Load translation";
-            }
+            if (Program.TagsList == null)
+                Program.TagsList = new TagsDB();
+            
+            Program.TagsList.SetNeedFixTags(Program.Settings.FixTagsOnSaveLoad);
+            Program.TagsList.ClearDb();
+            Program.TagsList.ClearLoadedFiles();
+            Program.TagsList.ResetVersion();
+            Program.TagsList.LoadCSVFromDir(tagsDir);
+            Program.TagsList.LoadTxtFromDir(tagsDir);
+            Program.TagsList.SortTags();
+            Program.TagsList.SaveTags(tagFile);
+            Program.TagsList.LoadTranslation(Program.TransManager);
+            
+            MessageBox.Show("标签数据已重新加载");
         }
     }
 }

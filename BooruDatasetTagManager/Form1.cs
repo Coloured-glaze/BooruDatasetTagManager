@@ -88,13 +88,33 @@ namespace BooruDatasetTagManager
             debugToolStripMenuItem.Visible = true;
 #endif
             
-            if (Program.Settings.LoadTranslationOnStartup)
+            await Task.Run(() =>
             {
-                await Task.Run(() =>
+                string tagsDir = Path.Combine(Application.StartupPath, "Tags");
+                if (!Directory.Exists(tagsDir))
+                    Directory.CreateDirectory(tagsDir);
+                
+                Program.TagsList.ClearDb();
+                Program.TagsList.ClearLoadedFiles();
+                Program.TagsList.ResetVersion();
+                Program.TagsList.LoadCSVFromDir(tagsDir);
+                Program.TagsList.LoadTxtFromDir(tagsDir);
+                Program.TagsList.SortTags();
+                Program.TagsList.LoadTranslation(Program.TransManager);
+                
+                Program.DataManager.AllTags.Clear();
+                foreach (var tag in Program.TagsList.Tags)
                 {
-                    Program.TagsList.LoadTranslation(Program.TransManager);
-                });
-            }
+                    if (!tag.IsAlias)
+                    {
+                        var allTagItem = new AllTagsItem(tag.Tag);
+                        allTagItem.Count = tag.Count;
+                        allTagItem.SetTranslation(tag.Translation);
+                        Program.DataManager.AllTags.tagsList.Add(allTagItem);
+                        Program.DataManager.AllTags.List.Add(allTagItem);
+                    }
+                }
+            });
         }
 
         private void ContextMenuImageGridHeader_ItemClicked(object sender, ToolStripItemClickedEventArgs e)

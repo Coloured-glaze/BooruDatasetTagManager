@@ -61,7 +61,6 @@ namespace BooruDatasetTagManager
             LabelTagFont = new System.Windows.Forms.Label();
             checkBoxLoadOnlyManual = new System.Windows.Forms.CheckBox();
             checkBoxManualTagLoading = new System.Windows.Forms.CheckBox();
-            checkBoxLoadTranslationOnStartup = new System.Windows.Forms.CheckBox();
             labelTranslService = new System.Windows.Forms.Label();
             comboBox2 = new System.Windows.Forms.ComboBox();
             checkBoxOfflineMode = new System.Windows.Forms.CheckBox();
@@ -69,7 +68,6 @@ namespace BooruDatasetTagManager
             textBoxTranslationFile = new System.Windows.Forms.TextBox();
             buttonBrowseTranslationFile = new System.Windows.Forms.Button();
             buttonReloadTags = new System.Windows.Forms.Button();
-            buttonLoadTranslation = new System.Windows.Forms.Button();
             labelHotkeysHelp = new System.Windows.Forms.Label();
             dataGridViewHotkeys = new System.Windows.Forms.DataGridView();
             CmdId = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -404,79 +402,69 @@ namespace BooruDatasetTagManager
             this.checkBoxManualTagLoading.Name = "checkBoxManualTagLoading";
             this.checkBoxManualTagLoading.Size = new System.Drawing.Size(180, 21);
             this.checkBoxManualTagLoading.TabIndex = 31;
-            this.checkBoxManualTagLoading.Text = "SettingManualTagLoading";
+            this.checkBoxManualTagLoading.Text = "Manual Tag Loading Mode";
             this.checkBoxManualTagLoading.UseVisualStyleBackColor = true;
-            // 
-            // checkBoxLoadTranslationOnStartup
-            // 
-            this.checkBoxLoadTranslationOnStartup.AutoSize = true;
-            this.checkBoxLoadTranslationOnStartup.Location = new System.Drawing.Point(15, 500);
-            this.checkBoxLoadTranslationOnStartup.Name = "checkBoxLoadTranslationOnStartup";
-            this.checkBoxLoadTranslationOnStartup.Size = new System.Drawing.Size(200, 21);
-            this.checkBoxLoadTranslationOnStartup.TabIndex = 32;
-            this.checkBoxLoadTranslationOnStartup.Text = "SettingLoadTranslationOnStartup";
-            this.checkBoxLoadTranslationOnStartup.UseVisualStyleBackColor = true;
             // 
             // checkBoxLoadOnlyManual
             // 
-            this.checkBoxLoadOnlyManual.AutoSize = true;
-            this.checkBoxLoadOnlyManual.Location = new System.Drawing.Point(13, 75);
-            this.checkBoxLoadOnlyManual.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.checkBoxLoadOnlyManual.Name = "checkBoxLoadOnlyManual";
-            this.checkBoxLoadOnlyManual.Size = new System.Drawing.Size(286, 19);
-            this.checkBoxLoadOnlyManual.TabIndex = 2;
-            this.checkBoxLoadOnlyManual.Text = "Load only manual translations into autocomplete";
-            this.checkBoxLoadOnlyManual.UseVisualStyleBackColor = true;
+            checkBoxLoadOnlyManual.AutoSize = true;
+            checkBoxLoadOnlyManual.Location = new System.Drawing.Point(13, 75);
+            checkBoxLoadOnlyManual.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            checkBoxLoadOnlyManual.Name = "checkBoxLoadOnlyManual";
+            checkBoxLoadOnlyManual.Size = new System.Drawing.Size(286, 19);
+            checkBoxLoadOnlyManual.TabIndex = 2;
+            checkBoxLoadOnlyManual.Text = "Load only manual translations into autocomplete";
+            checkBoxLoadOnlyManual.UseVisualStyleBackColor = true;
             // 
             // checkBoxOfflineMode
             // 
-            this.checkBoxOfflineMode.AutoSize = true;
-            this.checkBoxOfflineMode.Location = new System.Drawing.Point(13, 104);
-            this.checkBoxOfflineMode.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.checkBoxOfflineMode.Name = "checkBoxOfflineMode";
-            this.checkBoxOfflineMode.Size = new System.Drawing.Size(286, 19);
-            this.checkBoxOfflineMode.TabIndex = 3;
-            this.checkBoxOfflineMode.Text = "Offline translation mode";
-            this.checkBoxOfflineMode.UseVisualStyleBackColor = true;
+            checkBoxOfflineMode.AutoSize = true;
+            checkBoxOfflineMode.Location = new System.Drawing.Point(13, 104);
+            checkBoxOfflineMode.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            checkBoxOfflineMode.Name = "checkBoxOfflineMode";
+            checkBoxOfflineMode.Size = new System.Drawing.Size(286, 19);
+            checkBoxOfflineMode.TabIndex = 3;
+            checkBoxOfflineMode.Text = "Offline translation mode";
+            checkBoxOfflineMode.UseVisualStyleBackColor = true;
             // 
             // labelTranslationFile
             // 
-            this.labelTranslationFile.AutoSize = true;
-            this.labelTranslationFile.Location = new System.Drawing.Point(13, 133);
-            this.labelTranslationFile.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.labelTranslationFile.Name = "labelTranslationFile";
-            this.labelTranslationFile.Size = new System.Drawing.Size(103, 15);
-            this.labelTranslationFile.TabIndex = 4;
-            this.labelTranslationFile.Text = "Translation file";
+            labelTranslationFile.AutoSize = true;
+            labelTranslationFile.Location = new System.Drawing.Point(13, 133);
+            labelTranslationFile.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            labelTranslationFile.Name = "labelTranslationFile";
+            labelTranslationFile.Size = new System.Drawing.Size(103, 15);
+            labelTranslationFile.TabIndex = 4;
+            labelTranslationFile.Text = "Translation file";
             // 
             // textBoxTranslationFile
             // 
-            this.textBoxTranslationFile.Location = new System.Drawing.Point(13, 152);
-            this.textBoxTranslationFile.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.textBoxTranslationFile.Name = "textBoxTranslationFile";
-            this.textBoxTranslationFile.Size = new System.Drawing.Size(388, 23);
-            this.textBoxTranslationFile.TabIndex = 5;
+            textBoxTranslationFile.Location = new System.Drawing.Point(13, 152);
+            textBoxTranslationFile.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            textBoxTranslationFile.Name = "textBoxTranslationFile";
+            textBoxTranslationFile.Size = new System.Drawing.Size(388, 23);
+            textBoxTranslationFile.TabIndex = 5;
             // 
             // buttonBrowseTranslationFile
             // 
-            this.buttonBrowseTranslationFile.Location = new System.Drawing.Point(407, 152);
-            this.buttonBrowseTranslationFile.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.buttonBrowseTranslationFile.Name = "buttonBrowseTranslationFile";
-            this.buttonBrowseTranslationFile.Size = new System.Drawing.Size(75, 23);
-            this.buttonBrowseTranslationFile.TabIndex = 6;
-            this.buttonBrowseTranslationFile.Text = "Browse...";
-            this.buttonBrowseTranslationFile.UseVisualStyleBackColor = true;
-            this.buttonBrowseTranslationFile.Click += ButtonBrowseTranslationFile_Click;
+            buttonBrowseTranslationFile.Location = new System.Drawing.Point(407, 152);
+            buttonBrowseTranslationFile.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            buttonBrowseTranslationFile.Name = "buttonBrowseTranslationFile";
+            buttonBrowseTranslationFile.Size = new System.Drawing.Size(75, 23);
+            buttonBrowseTranslationFile.TabIndex = 6;
+            buttonBrowseTranslationFile.Text = "Browse...";
+            buttonBrowseTranslationFile.UseVisualStyleBackColor = true;
+            buttonBrowseTranslationFile.Click += ButtonBrowseTranslationFile_Click;
             // 
             // labelTranslService
             // 
-            this.labelTranslService.AutoSize = true;
-            this.labelTranslService.Location = new System.Drawing.Point(10, 47);
-            this.labelTranslService.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.labelTranslService.Name = "labelTranslService";
-            this.labelTranslService.Size = new System.Drawing.Size(103, 15);
-            this.labelTranslService.TabIndex = 0;
-            this.labelTranslService.Text = "Translation service";
+            labelTranslService.AutoSize = true;
+            labelTranslService.Location = new System.Drawing.Point(10, 47);
+            labelTranslService.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            labelTranslService.Name = "labelTranslService";
+            labelTranslService.Size = new System.Drawing.Size(103, 15);
+            labelTranslService.TabIndex = 0;
+            labelTranslService.Text = "Translation service";
             // 
             // comboBox2
             // 
@@ -581,7 +569,6 @@ namespace BooruDatasetTagManager
             this.tabGeneral.Controls.Add(comboAutocompMode);
             this.tabGeneral.Controls.Add(LabelAutocompSort);
             this.tabGeneral.Controls.Add(buttonReloadTags);
-            this.tabGeneral.Controls.Add(buttonLoadTranslation);
             tabGeneral.Location = new System.Drawing.Point(1, 23);
             tabGeneral.Name = "tabGeneral";
             tabGeneral.Size = new System.Drawing.Size(628, 403);
@@ -604,20 +591,9 @@ namespace BooruDatasetTagManager
             buttonReloadTags.Name = "buttonReloadTags";
             buttonReloadTags.Size = new System.Drawing.Size(200, 30);
             buttonReloadTags.TabIndex = 12;
-            buttonReloadTags.Text = "SettingBtnReloadTags";
+            buttonReloadTags.Text = "Reload tags from files";
             buttonReloadTags.UseVisualStyleBackColor = true;
             buttonReloadTags.Click += ButtonReloadTags_Click;
-            // 
-            // buttonLoadTranslation
-            // 
-            buttonLoadTranslation.AutoSize = true;
-            buttonLoadTranslation.Location = new System.Drawing.Point(15, 363);
-            buttonLoadTranslation.Name = "buttonLoadTranslation";
-            buttonLoadTranslation.Size = new System.Drawing.Size(200, 30);
-            buttonLoadTranslation.TabIndex = 13;
-            buttonLoadTranslation.Text = "SettingBtnLoadTranslation";
-            buttonLoadTranslation.UseVisualStyleBackColor = true;
-            buttonLoadTranslation.Click += ButtonLoadTranslation_Click;
             // 
             // textBox4
             // 
@@ -883,7 +859,6 @@ namespace BooruDatasetTagManager
             Controls.Add(BtnCancel);
             Controls.Add(BtnSave);
             Controls.Add(checkBoxManualTagLoading);
-            Controls.Add(checkBoxLoadTranslationOnStartup);
             Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             Name = "Form_settings";
             StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -923,7 +898,6 @@ namespace BooruDatasetTagManager
         private System.Windows.Forms.ComboBox comboBox2;
         private System.Windows.Forms.CheckBox checkBoxLoadOnlyManual;
         private System.Windows.Forms.CheckBox checkBoxManualTagLoading;
-        private System.Windows.Forms.CheckBox checkBoxLoadTranslationOnStartup;
         private System.Windows.Forms.CheckBox checkBoxOfflineMode;
         private System.Windows.Forms.Label labelTranslationFile;
         private System.Windows.Forms.TextBox textBoxTranslationFile;
@@ -985,6 +959,5 @@ namespace BooruDatasetTagManager
         private System.Windows.Forms.NumericUpDown numericUpDownOpenAiTimeout;
         private System.Windows.Forms.Label labelOpenAiTimeout;
         private System.Windows.Forms.Button buttonReloadTags;
-        private System.Windows.Forms.Button buttonLoadTranslation;
     }
 }

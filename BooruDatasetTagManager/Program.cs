@@ -49,10 +49,9 @@ namespace BooruDatasetTagManager
             string tagsDir = Path.Combine(Application.StartupPath, "Tags");
             if(!Directory.Exists(tagsDir))
                 Directory.CreateDirectory(tagsDir);
-            string tagFile = Path.Combine(tagsDir, "List.tdb");
-            TagsList = TagsDB.LoadFromTagFile(tagFile);
-            if (TagsList == null)
-                TagsList = new TagsDB();
+            
+            TagsList = new TagsDB();
+            TagsList.SetNeedFixTags(Program.Settings.FixTagsOnSaveLoad);
             
             AutoTagger = new AiApiClient();
             if (!string.IsNullOrEmpty(Settings.OpenAiAutoTagger.ConnectionAddress) && !string.IsNullOrEmpty(Settings.OpenAiAutoTagger.ApiKey))
