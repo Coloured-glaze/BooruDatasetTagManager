@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -133,6 +133,19 @@ namespace BooruDatasetTagManager
         {
             RemoveTag(oldTag);
             AddTag(newTag);
+        }
+
+        public void Clear()
+        {
+            tagsList.Clear();
+            List.Clear();
+        }
+
+        public void AddItem(AllTagsItem item)
+        {
+            item.Parent = this;
+            tagsList.Add(item);
+            List.Add(item);
         }
 
         public string[] GetAllTagsList()

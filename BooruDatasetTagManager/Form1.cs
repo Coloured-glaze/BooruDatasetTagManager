@@ -110,8 +110,7 @@ namespace BooruDatasetTagManager
                         var allTagItem = new AllTagsItem(tag.Tag);
                         allTagItem.Count = tag.Count;
                         allTagItem.SetTranslation(tag.Translation);
-                        Program.DataManager.AllTags.tagsList.Add(allTagItem);
-                        Program.DataManager.AllTags.List.Add(allTagItem);
+                        Program.DataManager.AllTags.AddItem(allTagItem);
                     }
                 }
             });
