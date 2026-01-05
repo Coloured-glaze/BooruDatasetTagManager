@@ -20,7 +20,7 @@ namespace BooruDatasetTagManager
         /// Главная точка входа для приложения.
         /// </summary>
         [STAThread]
-        static void Main()
+        static async void Main()
         {
             PreloadDotnetDependenciesFromSubdirectoryManually();
             Application.EnableVisualStyles();
@@ -36,59 +36,26 @@ namespace BooruDatasetTagManager
             ColorManager = new ColorSchemeManager();
             ColorManager.Load(Path.Combine(Application.StartupPath, "ColorScheme.json"));
             ColorManager.SelectScheme(Program.Settings.ColorScheme);
-            #region waitForm
-            Form f_wait = new Form();
+            
             I18n.Initialize(Program.Settings.Language);
             Settings.Hotkeys.ChangeLanguage();
-            f_wait.AutoScaleMode = AutoScaleMode.Dpi;
-            f_wait.Width = 480;
-            f_wait.Height = 144;
-            f_wait.FormBorderStyle = FormBorderStyle.FixedDialog;
-            f_wait.ControlBox = false;
-            f_wait.StartPosition = FormStartPosition.CenterScreen;
-            Label mes = new Label();
-            mes.Text = I18n.GetText("TipTagLoad");
-            mes.Location = new System.Drawing.Point(10, 10);
-            mes.AutoSize = true;
-
-            f_wait.Controls.Add(mes);
-
-            ColorManager.ChangeColorScheme(f_wait, ColorManager.SelectedScheme);
-            ColorManager.ChangeColorSchemeInConteiner(f_wait.Controls, ColorManager.SelectedScheme);
             
-            f_wait.Shown += async (o, i) =>
+            await Task.Run(() =>
             {
-                await Task.Run(() =>
-                {
-                    string translationsDir = Path.Combine(Application.StartupPath, "Translations");
-                    if (!Directory.Exists(translationsDir))
-                        Directory.CreateDirectory(translationsDir);
-                    TransManager = new TranslationManager(Program.Settings.TranslationLanguage, Program.Settings.TransService, translationsDir, Program.Settings.OfflineTranslationMode, Program.Settings.TranslationFilePath);
-                    TransManager.LoadTranslations();
-                    string tagsDir = Path.Combine(Application.StartupPath, "Tags");
-                    if(!Directory.Exists(tagsDir))
-                        Directory.CreateDirectory(tagsDir);
-                    string tagFile = Path.Combine(tagsDir, "List.tdb");
-                    TagsList = TagsDB.LoadFromTagFile(tagFile);
-                    if (TagsList == null)
-                        TagsList = new TagsDB();
-                    if (!Program.Settings.ManualTagLoadingMode && TagsList.IsNeedUpdate(tagsDir))
-                    {
-                        TagsList.SetNeedFixTags(Program.Settings.FixTagsOnSaveLoad);
-                        TagsList.ClearDb();
-                        TagsList.ClearLoadedFiles();
-                        TagsList.ResetVersion();
-                        TagsList.LoadCSVFromDir(tagsDir);
-                        TagsList.LoadTxtFromDir(tagsDir);
-                        TagsList.SortTags();
-                        TagsList.SaveTags(tagFile);
-                    }
-                    TagsList.LoadTranslation(TransManager);
-                });
-                f_wait.Close();
-            };
-            f_wait.ShowDialog();
-            #endregion
+                string translationsDir = Path.Combine(Application.StartupPath, "Translations");
+                if (!Directory.Exists(translationsDir))
+                    Directory.CreateDirectory(translationsDir);
+                TransManager = new TranslationManager(Program.Settings.TranslationLanguage, Program.Settings.TransService, translationsDir, Program.Settings.OfflineTranslationMode, Program.Settings.TranslationFilePath);
+                TransManager.LoadTranslations();
+                string tagsDir = Path.Combine(Application.StartupPath, "Tags");
+                if(!Directory.Exists(tagsDir))
+                    Directory.CreateDirectory(tagsDir);
+                string tagFile = Path.Combine(tagsDir, "List.tdb");
+                TagsList = TagsDB.LoadFromTagFile(tagFile);
+                if (TagsList == null)
+                    TagsList = new TagsDB();
+                TagsList.LoadTranslation(TransManager);
+            });
             AutoTagger = new AiApiClient();
             if (!string.IsNullOrEmpty(Settings.OpenAiAutoTagger.ConnectionAddress) && !string.IsNullOrEmpty(Settings.OpenAiAutoTagger.ApiKey))
             {

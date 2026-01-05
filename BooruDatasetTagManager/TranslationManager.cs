@@ -19,7 +19,7 @@ namespace BooruDatasetTagManager
         private AbstractTranslator translator;
         private string translationFilePath;
         private HashSet<long> _hashSet;
-        private Dictionary<long, string> _translationDict;
+        private Dictionary<string, string> _translationDict;
         private bool _offlineMode;
         private bool _isCsvFormat;
 
@@ -83,6 +83,8 @@ namespace BooruDatasetTagManager
                     {
                         string orig = processLine.Substring(0, commaIndex).Trim();
                         string trans = processLine.Substring(commaIndex + 1).Trim();
+                        // CSV格式：将下划线替换为空格
+                        orig = orig.Replace("_", " ");
                         txtLine = (manual ? "*" : "") + orig + "=" + trans;
                     }
                 }
@@ -93,7 +95,7 @@ namespace BooruDatasetTagManager
                 {
                     Translations.Add(transItem);
                     _hashSet.Add(transItem.OrigHash);
-                    _translationDict[transItem.OrigHash] = transItem.Trans;
+                    _translationDict[transItem.Orig.ToLower()] = transItem.Trans;
                 }
             }
         }
@@ -140,8 +142,7 @@ namespace BooruDatasetTagManager
 
         public bool Contains(string orig)
         {
-            string searchKey = _isCsvFormat ? orig.Replace(" ", "_") : orig;
-            return _hashSet.Contains(searchKey.ToLower().GetHash());
+            return _translationDict.ContainsKey(orig.ToLower());
         }
 
         public bool Contains(long hash)
@@ -151,8 +152,12 @@ namespace BooruDatasetTagManager
 
         public string GetTranslation(string text)
         {
-            string searchKey = _isCsvFormat ? text.Replace(" ", "_") : text;
-            return GetTranslation(searchKey.ToLower().GetHash());
+            string result;
+            if (_translationDict.TryGetValue(text.ToLower(), out result))
+            {
+                return result;
+            }
+            return null;
         }
 
         public string GetTranslation(long hash)
@@ -209,7 +214,7 @@ namespace BooruDatasetTagManager
             var newItem = new TransItem(orig, trans, isManual, false);
             Translations.Add(newItem);
             _hashSet.Add(newItem.OrigHash);
-            _translationDict[newItem.OrigHash] = trans;
+            _translationDict[newItem.Orig.ToLower()] = trans;
         }
 
         public async Task AddTranslationAsync(string orig, string trans, bool isManual)
@@ -230,7 +235,7 @@ namespace BooruDatasetTagManager
             var newItem = new TransItem(orig, trans, isManual, false);
             Translations.Add(newItem);
             _hashSet.Add(newItem.OrigHash);
-            _translationDict[newItem.OrigHash] = trans;
+            _translationDict[newItem.Orig.ToLower()] = trans;
         }
 
         public async Task<string> TranslateAsync(string text)
