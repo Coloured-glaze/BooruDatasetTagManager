@@ -23,6 +23,7 @@ namespace BooruDatasetTagManager
         private bool _isSorted = false;
         private PropertyDescriptor _propertyDescriptor;
         private ListSortDirection _sortDirection = ListSortDirection.Ascending;
+        private bool isTranslating = false;
 
         public AllTagsItem this[int index]
         {
@@ -43,6 +44,9 @@ namespace BooruDatasetTagManager
 
         public void TranslateAllTags()
         {
+            if (isTranslating)
+                return;
+            isTranslating = true;
             TranslateAllAsync();
         }
 
@@ -80,6 +84,7 @@ namespace BooruDatasetTagManager
                     }
                 }
             }
+            isTranslating = false;
         }
 
         public void AddTag(string tag)

@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -27,6 +27,7 @@ namespace BooruDatasetTagManager
         private int originalHash;
 
         private bool isTranslate = false;
+        private bool isLoading = false;
 
         private FilterType lastAndOperation = FilterType.Or;
         private IEnumerable<string> lastTagsFilter = null;
@@ -280,12 +281,14 @@ namespace BooruDatasetTagManager
 
         public bool LoadFromFolder(string folder, bool loadPreviewImages, bool readMetadata)
         {
+            isLoading = true;
             List<string> allowedExt = new List<string>();
             allowedExt.AddRange(Extensions.ImageExtensions);
             allowedExt.AddRange(Extensions.VideoExtensions);
             string[] imgs = Directory.GetFiles(folder, "*.*", SearchOption.AllDirectories);
             if (imgs.Length == 0)
             {
+                isLoading = false;
                 return false;
             }
             imgs = imgs.Where(a => allowedExt.Contains(Path.GetExtension(a).ToLower())).OrderBy(a => a, new FileNamesComparer()).ToArray();
@@ -304,6 +307,11 @@ namespace BooruDatasetTagManager
             });
             UpdateDatasetHash();
             AllTagsBindingSource.Sort = "Tag ASC";
+            isLoading = false;
+            if (isTranslate)
+            {
+                AllTags.TranslateAllTags();
+            }
             return true;
         }
 
@@ -320,7 +328,7 @@ namespace BooruDatasetTagManager
                 if (changedType == ListChangedType.ItemAdded)
                 {
                     AllTags.AddTag(newTag);
-                    if (isTranslate)
+                    if (isTranslate && !isLoading)
                     {
                         //eTagList.TranslateAllAsync();
                         AllTags.TranslateAllTags();
@@ -333,7 +341,7 @@ namespace BooruDatasetTagManager
                 else if (changedType == ListChangedType.ItemChanged)
                 {
                     AllTags.ChangeTag(oldTag, newTag);
-                    if (isTranslate)
+                    if (isTranslate && !isLoading)
                     {
                         //eTagList.TranslateAllAsync();
                         AllTags.TranslateAllTags();
