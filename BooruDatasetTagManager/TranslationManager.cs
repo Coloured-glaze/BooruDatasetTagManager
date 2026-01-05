@@ -18,6 +18,7 @@ namespace BooruDatasetTagManager
         public List<TransItem> Translations { get; set; }
         private AbstractTranslator translator;
         private string translationFilePath;
+        private Dictionary<string, TransItem> _translationDict;
         private bool _offlineMode;
         private bool _isCsvFormat;
 
@@ -26,6 +27,7 @@ namespace BooruDatasetTagManager
             _language = toLang;
             _workDir = workDir;
             Translations = new List<TransItem>();
+            _translationDict = new Dictionary<string, TransItem>(StringComparer.OrdinalIgnoreCase);
             _offlineMode = offlineMode;
             translator = AbstractTranslator.Create(service);
             if (!string.IsNullOrEmpty(customTranslationFile) && File.Exists(customTranslationFile))
@@ -92,10 +94,11 @@ namespace BooruDatasetTagManager
                     trans = processLine.Substring(index + 1).Trim();
                 }
                 
-                if (!string.IsNullOrEmpty(orig) && !Translations.Any(t => t.Orig.Equals(orig, StringComparison.OrdinalIgnoreCase)))
+                if (!string.IsNullOrEmpty(orig) && !_translationDict.ContainsKey(orig))
                 {
                     var newItem = new TransItem(orig, trans, manual, false);
                     Translations.Add(newItem);
+                    _translationDict[orig] = newItem;
                 }
             }
         }
@@ -133,12 +136,13 @@ namespace BooruDatasetTagManager
             translationFilePath = txtFilePath;
             
             Translations.Clear();
+            _translationDict.Clear();
             LoadTranslations();
         }
 
         public bool Contains(string orig)
         {
-            return Translations.Any(t => t.Orig.Equals(orig, StringComparison.OrdinalIgnoreCase));
+            return _translationDict.ContainsKey(orig);
         }
 
         public bool Contains(long hash)
@@ -148,14 +152,28 @@ namespace BooruDatasetTagManager
 
         public string GetTranslation(string text)
         {
-            var res = Translations.FirstOrDefault(t => t.Orig.Equals(text, StringComparison.OrdinalIgnoreCase));
-            return res?.Trans;
+            if (_translationDict.TryGetValue(text, out var item))
+            {
+                return item.Trans;
+            }
+            return null;
         }
 
         public string GetTranslation(string text, bool onlyManual)
         {
-            var res = Translations.FirstOrDefault(t => t.Orig.Equals(text, StringComparison.OrdinalIgnoreCase) && t.IsManual == onlyManual);
-            return res?.Trans;
+            if (onlyManual)
+            {
+                var res = Translations.FirstOrDefault(t => t.Orig.Equals(text, StringComparison.OrdinalIgnoreCase) && t.IsManual == onlyManual);
+                return res?.Trans;
+            }
+            else
+            {
+                if (_translationDict.TryGetValue(text, out var item))
+                {
+                    return item.Trans;
+                }
+                return null;
+            }
         }
 
         public async Task<string> GetTranslationAsync(string text)
@@ -181,6 +199,7 @@ namespace BooruDatasetTagManager
             File.AppendAllText(translationFilePath, line + "\r\n", Encoding.UTF8);
             var newItem = new TransItem(orig, trans, isManual, false);
             Translations.Add(newItem);
+            _translationDict[orig] = newItem;
         }
 
         public async Task AddTranslationAsync(string orig, string trans, bool isManual)
@@ -200,6 +219,7 @@ namespace BooruDatasetTagManager
             sw.Close();
             var newItem = new TransItem(orig, trans, isManual, false);
             Translations.Add(newItem);
+            _translationDict[orig] = newItem;
         }
 
         public async Task<string> TranslateAsync(string text)
