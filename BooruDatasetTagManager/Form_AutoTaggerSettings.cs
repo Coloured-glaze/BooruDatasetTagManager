@@ -41,11 +41,17 @@ namespace BooruDatasetTagManager
         private async void ConnectRechecker_Tick(object sender, EventArgs e)
         {
             if (isClosing)
+            {
+                connectRechecker.Stop();
                 return;
+            }
             if (await Program.AutoTagger.ConnectAsync())
             {
                 if (isClosing)
+                {
+                    connectRechecker.Stop();
                     return;
+                }
                 if (Controls.ContainsKey("errorLabel"))
                 {
                     Controls.RemoveByKey("errorLabel");
@@ -154,8 +160,12 @@ namespace BooruDatasetTagManager
         private void Form_AutoTaggerSettings_FormClosing(object sender, FormClosingEventArgs e)
         {
             isClosing = true;
-            if (connectRechecker != null && connectRechecker.Enabled)
+            if (connectRechecker != null)
+            {
                 connectRechecker.Stop();
+                connectRechecker.Dispose();
+                connectRechecker = null;
+            }
             if (Controls.ContainsKey("errorLabel"))
             {
                 Controls.RemoveByKey("errorLabel");

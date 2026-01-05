@@ -74,6 +74,36 @@ namespace BooruDatasetTagManager
             }
         }
 
+        public void ConvertCsvToTxt()
+        {
+            if (!_isCsvFormat)
+                return;
+
+            string txtFilePath = Path.Combine(_workDir, _language + ".txt");
+            if (File.Exists(txtFilePath))
+            {
+                File.Delete(txtFilePath);
+            }
+
+            var sw = File.CreateText(txtFilePath);
+            sw.WriteLine("//Translation format: <original>=<translation>");
+            
+            foreach (var transItem in Translations)
+            {
+                string line;
+                if (transItem.IsManual)
+                {
+                    line = $"*{transItem.Orig}={transItem.Trans}";
+                }
+                else
+                {
+                    line = $"{transItem.Orig}={transItem.Trans}";
+                }
+                sw.WriteLine(line);
+            }
+            sw.Dispose();
+        }
+
         public bool Contains(string orig)
         {
             return _hashSet.Contains(GetNormalizedHash(orig));
@@ -150,10 +180,10 @@ namespace BooruDatasetTagManager
             }
             else
             {
-                line = $"{orig}={trans}";
+                line = $"{(isManual ? "*" : "")}{orig}={trans}";
             }
             File.AppendAllText(translationFilePath, line + "\r\n", Encoding.UTF8);
-            var newItem = new TransItem(normalizedOrig, trans, isManual);
+            var newItem = new TransItem(orig, trans, isManual);
             Translations.Add(newItem);
             _hashSet.Add(newItem.OrigHash);
             _translationDict[newItem.OrigHash] = trans;
@@ -174,7 +204,7 @@ namespace BooruDatasetTagManager
             }
             await sw.WriteLineAsync(line);
             sw.Close();
-            var newItem = new TransItem(normalizedOrig, trans, isManual);
+            var newItem = new TransItem(orig, trans, isManual);
             Translations.Add(newItem);
             _hashSet.Add(newItem.OrigHash);
             _translationDict[newItem.OrigHash] = trans;
@@ -248,8 +278,13 @@ namespace BooruDatasetTagManager
                 string orig = text.Substring(0, index).Trim();
                 string trans = text.Substring(index + 1).Trim();
                 
-                // 对于CSV格式，原始文本已经包含了下划线替换，所以不需要再次处理
-                // 对于TXT格式，保持原始文本不变
+                // 对于CSV格式，原始文本已经包含了下划线替换，需要将下划线还原为空格
+                // 这样在查询时，GetNormalizedHash 会再次将空格替换为下划线，保证哈希一致
+                if (isCsvFormat)
+                {
+                    orig = orig.Replace("_", " ");
+                }
+                
                 return new TransItem(orig, trans, manual);
             }
 

@@ -149,7 +149,7 @@ namespace BooruDatasetTagManager.AiApi
                 {
                     if (autoTaggerSettings.ShowDialog() != DialogResult.OK || Program.OpenAiAutoTagger == null || string.IsNullOrEmpty(Program.Settings.OpenAiAutoTagger.Model))
                     {
-                        return (new List<AiApiClient.AutoTagItem>(), I18n.GetText("TipGenCancel"));
+                        return (null, I18n.GetText("TipGenCancel"));
                     }
                 }
             }
