@@ -140,7 +140,8 @@ namespace BooruDatasetTagManager
 
         public bool Contains(string orig)
         {
-            return _hashSet.Contains(orig.ToLower().GetHash());
+            string searchKey = _isCsvFormat ? orig.Replace(" ", "_") : orig;
+            return _hashSet.Contains(searchKey.ToLower().GetHash());
         }
 
         public bool Contains(long hash)
@@ -150,7 +151,8 @@ namespace BooruDatasetTagManager
 
         public string GetTranslation(string text)
         {
-            return GetTranslation(text.ToLower().GetHash());
+            string searchKey = _isCsvFormat ? text.Replace(" ", "_") : text;
+            return GetTranslation(searchKey.ToLower().GetHash());
         }
 
         public string GetTranslation(long hash)

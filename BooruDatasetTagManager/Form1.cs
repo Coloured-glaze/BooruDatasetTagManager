@@ -1724,6 +1724,7 @@ namespace BooruDatasetTagManager
             MenuOpenAiGenTagsForAllImages.Text = I18n.GetText("MenuOpenAiGenTagsForAllImages");
             cropImagesWithMoondream2ToolStripMenuItem.Text = I18n.GetText("MenuToolsAutoCropping");
             backgroundRemovalWithRMBG20ToolStripMenuItem.Text = I18n.GetText("MenuToolsBGRemoval");
+            reloadTagsToolStripMenuItem.Text = I18n.GetText("MenuReloadTags");
             removeBackgroundToolStripMenuItem.Text = I18n.GetText("MenuContextDSRemoveBG");
 
             BtnTagAddToAll.Text = I18n.GetText("BtnTagAddToAll");
@@ -2709,6 +2710,31 @@ namespace BooruDatasetTagManager
                 }
                 fCrop.Close();
             }
+        }
+
+        private void reloadTagsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string tagsDir = Path.Combine(Application.StartupPath, "Tags");
+            if (!Directory.Exists(tagsDir))
+                Directory.CreateDirectory(tagsDir);
+            
+            string tagFile = Path.Combine(tagsDir, "List.tdb");
+            
+            if (Program.TagsList == null)
+                Program.TagsList = new TagsDB();
+            
+            Program.TagsList.SetNeedFixTags(Program.Settings.FixTagsOnSaveLoad);
+            Program.TagsList.ClearDb();
+            Program.TagsList.ClearLoadedFiles();
+            Program.TagsList.ResetVersion();
+            Program.TagsList.LoadCSVFromDir(tagsDir);
+            Program.TagsList.LoadTxtFromDir(tagsDir);
+            Program.TagsList.SortTags();
+            Program.TagsList.SaveTags(tagFile);
+            Program.TagsList.LoadTranslation(Program.TransManager);
+            
+            RefreshAllTagsList();
+            SetStatus("标签数据已重新加载");
         }
 
         private async void btnOpenAiAutoGetTagsDefSet_Click(object sender, EventArgs e)

@@ -254,6 +254,7 @@ UIBGRemovalFormModelsLabel=背景移除模型
 UIBGRemovalFormRemovingTestBtn=移除测试
 MenuToolsAutoCropping=使用moondream2裁剪图片
 MenuToolsBGRemoval=使用BiRefNet移除背景
+MenuReloadTags=重新加载标签数据
 MenuContextDSRemoveBG=移除背景
 TipLoadingStart=加载中，请稍候...
 TipLoadingComplete=加载完成

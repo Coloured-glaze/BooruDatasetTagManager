@@ -251,6 +251,7 @@ UIBGRemovalFormModelsLabel=Background Removal Models
 UIBGRemovalFormRemovingTestBtn=Removing test
 MenuToolsAutoCropping=Crop images with moondream2
 MenuToolsBGRemoval=Background Removal with BiRefNet
+MenuReloadTags=Reload tag data
 MenuContextDSRemoveBG=Remove background
 TipLoadingStart=Loading, please wait...
 TipLoadingComplete=Loading completed

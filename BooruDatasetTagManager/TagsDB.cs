@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -70,15 +70,13 @@ namespace BooruDatasetTagManager
         public void LoadCSVFromDir(string dir)
         {
             FileInfo[] csvFiles = new DirectoryInfo(dir).GetFiles("*.csv", SearchOption.TopDirectoryOnly);
-            foreach (var item in csvFiles)
-                LoadFromCSVFile(item.FullName);
+            Parallel.ForEach(csvFiles, item => LoadFromCSVFile(item.FullName));
         }
 
         public void LoadTxtFromDir(string dir)
         {
             FileInfo[] txtFiles = new DirectoryInfo(dir).GetFiles("*.txt", SearchOption.TopDirectoryOnly);
-            foreach (var item in txtFiles)
-                LoadFromTxtFile(item.FullName);
+            Parallel.ForEach(txtFiles, item => LoadFromTxtFile(item.FullName));
         }
 
         public void LoadFromTxtFile(string fPath, bool append = true)
@@ -102,10 +100,13 @@ namespace BooruDatasetTagManager
             string[] lines = ReadAllLines(data, Encoding.UTF8);
             if (!append)
                 ClearDb();
-            foreach (var item in lines)
+            Parallel.ForEach(lines, item =>
             {
-                AddTag(item, 0);
-            }
+                lock (Tags)
+                {
+                    AddTag(item, 0);
+                }
+            });
         }
 
 
@@ -132,20 +133,23 @@ namespace BooruDatasetTagManager
             string[] lines = ReadAllLines(data, Encoding.UTF8);
             if (!append)
                 Tags.Clear();
-            foreach (var item in lines)
+            Parallel.ForEach(lines, item =>
             {
                 Match match = r.Match(item);
                 if (match.Success)
                 {
                     string tagName = match.Groups[1].Value;
                     string[] aliases = match.Groups[4].Value.Replace("\"", "").Split(splitter, StringSplitOptions.RemoveEmptyEntries);
-                    AddTag(tagName, Convert.ToInt32(match.Groups[3].Value));
-                    foreach (var al in aliases)
+                    lock (Tags)
                     {
-                        AddTag(al, Convert.ToInt32(match.Groups[3].Value), true, tagName);
+                        AddTag(tagName, Convert.ToInt32(match.Groups[3].Value));
+                        foreach (var al in aliases)
+                        {
+                            AddTag(al, Convert.ToInt32(match.Groups[3].Value), true, tagName);
+                        }
                     }
                 }
-            }
+            });
         }
 
         public void SortTags()
@@ -165,20 +169,23 @@ namespace BooruDatasetTagManager
 
             int existTagIndex = -1;
             TagItem tagItem = null;
-            if (hashes.TryGetValue(tagHash, out existTagIndex))
+            lock (hashes)
             {
-                tagItem = Tags[existTagIndex];
-                tagItem.Count += count;
-            }
-            else
-            {
-                tagItem = new TagItem();
-                tagItem.SetTag(tag);
-                tagItem.Count = count;
-                tagItem.IsAlias = isAlias;
-                tagItem.Parent = PrepareTag(parent);
-                hashes.Add(tagItem.TagHash, Tags.Count);
-                Tags.Add(tagItem);
+                if (hashes.TryGetValue(tagHash, out existTagIndex))
+                {
+                    tagItem = Tags[existTagIndex];
+                    tagItem.Count += count;
+                }
+                else
+                {
+                    tagItem = new TagItem();
+                    tagItem.SetTag(tag);
+                    tagItem.Count = count;
+                    tagItem.IsAlias = isAlias;
+                    tagItem.Parent = PrepareTag(parent);
+                    hashes.Add(tagItem.TagHash, Tags.Count);
+                    Tags.Add(tagItem);
+                }
             }
         }
 
