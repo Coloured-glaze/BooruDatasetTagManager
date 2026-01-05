@@ -231,7 +231,7 @@ namespace BooruDatasetTagManager
             bool onlyManual = Program.Settings.OnlyManualTransInAutocomplete;
             foreach (var tag in Tags)
             {
-                tag.Translation = transManager.GetTranslation(tag.TagHash, onlyManual);
+                tag.Translation = transManager.GetTranslation(tag.Tag, onlyManual);
             }
         }
 
