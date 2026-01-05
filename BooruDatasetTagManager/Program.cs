@@ -53,7 +53,7 @@ namespace BooruDatasetTagManager
             TagsList = TagsDB.LoadFromTagFile(tagFile);
             if (TagsList == null)
                 TagsList = new TagsDB();
-            TagsList.LoadTranslation(TransManager);
+            
             AutoTagger = new AiApiClient();
             if (!string.IsNullOrEmpty(Settings.OpenAiAutoTagger.ConnectionAddress) && !string.IsNullOrEmpty(Settings.OpenAiAutoTagger.ApiKey))
             {

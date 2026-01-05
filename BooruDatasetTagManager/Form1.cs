@@ -66,7 +66,7 @@ namespace BooruDatasetTagManager
         private List<string> selectedFiles = new List<string>();
 
 
-        private void Form1_Load(object sender, EventArgs e)
+        private async void Form1_Load(object sender, EventArgs e)
         {
             Text += " " + Application.ProductVersion;
             gridViewDS.RowTemplate.Height = Program.Settings.PreviewSize + 10;
@@ -87,6 +87,11 @@ namespace BooruDatasetTagManager
 #else
             debugToolStripMenuItem.Visible = true;
 #endif
+            
+            await Task.Run(() =>
+            {
+                Program.TagsList.LoadTranslation(Program.TransManager);
+            });
         }
 
         private void ContextMenuImageGridHeader_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
