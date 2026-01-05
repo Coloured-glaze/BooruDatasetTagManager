@@ -1,4 +1,4 @@
-﻿using Manina.Windows.Forms;
+using Manina.Windows.Forms;
 using Microsoft.VisualBasic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -555,7 +555,17 @@ namespace BooruDatasetTagManager
             {
                 EditableTag eTag = (EditableTag)List[i];
                 if (string.IsNullOrEmpty(eTag.Translation))
-                    eTag.Translation = await Program.TransManager.TranslateAsync(eTag.Tag);
+                {
+                    var existingTranslation = Program.TransManager.GetTranslation(eTag.Tag);
+                    if (!string.IsNullOrEmpty(existingTranslation))
+                    {
+                        eTag.Translation = existingTranslation;
+                    }
+                    else
+                    {
+                        eTag.Translation = await Program.TransManager.TranslateAsync(eTag.Tag);
+                    }
+                }
             }
             isStoreHistory = true;
         }

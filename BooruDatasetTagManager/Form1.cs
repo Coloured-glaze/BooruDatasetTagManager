@@ -281,8 +281,22 @@ namespace BooruDatasetTagManager
                 {
                     SetStatus($"{I18n.GetText("SettingTabTranslations")} {i}/{grid.RowCount}");
                     grid[transColumnName, i].ReadOnly = true;
-                    if (string.IsNullOrWhiteSpace((string)grid[transColumnName, i].Value) && !string.IsNullOrWhiteSpace((string)grid[imageTagsColumn, i].Value))
-                        grid[transColumnName, i].Value = await Program.TransManager.TranslateAsync((string)grid[imageTagsColumn, i].Value);
+                    
+                    var tagValue = (string)grid[imageTagsColumn, i].Value;
+                    var transValue = (string)grid[transColumnName, i].Value;
+                    
+                    if (!string.IsNullOrWhiteSpace(tagValue) && string.IsNullOrWhiteSpace(transValue))
+                    {
+                        var existingTranslation = Program.TransManager.GetTranslation(tagValue);
+                        if (!string.IsNullOrEmpty(existingTranslation))
+                        {
+                            grid[transColumnName, i].Value = existingTranslation;
+                        }
+                        else
+                        {
+                            grid[transColumnName, i].Value = await Program.TransManager.TranslateAsync(tagValue);
+                        }
+                    }
                 }
             }
             catch (Exception ex)

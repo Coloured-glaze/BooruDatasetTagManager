@@ -57,7 +57,16 @@ namespace BooruDatasetTagManager
                 {
                     if (!string.IsNullOrEmpty(tagsList[i].Tag))
                     {
-                        string result = await Program.TransManager.TranslateAsync(tagsList[i].Tag);
+                        var existingTranslation = Program.TransManager.GetTranslation(tagsList[i].Tag);
+                        string result;
+                        if (!string.IsNullOrEmpty(existingTranslation))
+                        {
+                            result = existingTranslation;
+                        }
+                        else
+                        {
+                            result = await Program.TransManager.TranslateAsync(tagsList[i].Tag);
+                        }
                         tagsList[i].SetTranslation(result);
                     }
                     else

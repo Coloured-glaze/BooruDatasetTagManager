@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -124,7 +124,15 @@ namespace BooruDatasetTagManager
                     row["Tag"] = i == 0 ? item.Key : "";//tag
                     if (isTranslateMode)
                     {
-                        row["Translation"] = i == 0 ? await Program.TransManager.TranslateAsync(item.Key) : "";//tag
+                        if (i == 0)
+                        {
+                            var existingTranslation = Program.TransManager.GetTranslation(item.Key);
+                            row["Translation"] = !string.IsNullOrEmpty(existingTranslation) ? existingTranslation : await Program.TransManager.TranslateAsync(item.Key);
+                        }
+                        else
+                        {
+                            row["Translation"] = "";
+                        }
                     }
                     row["Image"] = item.Value[i].Value.ImageFilePath;//ImgName
                     row["ImageName"] = item.Value[i].Value.Name;//ImgName
