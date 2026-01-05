@@ -33,6 +33,7 @@ namespace BooruDatasetTagManager
             comboBox1.SelectedValue = Program.Settings.TranslationLanguage;
             checkBoxLoadOnlyManual.Checked = Program.Settings.OnlyManualTransInAutocomplete;
             checkBoxManualTagLoading.Checked = Program.Settings.ManualTagLoadingMode;
+            checkBoxLoadTranslationOnStartup.Checked = Program.Settings.LoadTranslationOnStartup;
             comboBox2.Items.AddRange(Extensions.GetFriendlyEnumValues<TranslationService>());
             comboBox2.SelectedIndex = Extensions.GetEnumIndexFromValue<TranslationService>(Program.Settings.TransService.ToString());
             comboAutocompMode.Items.AddRange(Extensions.GetFriendlyEnumValues<AutocompleteMode>());
@@ -108,6 +109,7 @@ namespace BooruDatasetTagManager
             Program.Settings.TransService = Extensions.GetEnumItemFromFriendlyText<TranslationService>(comboBox2.SelectedItem.ToString());
             Program.Settings.OnlyManualTransInAutocomplete = checkBoxLoadOnlyManual.Checked;
             Program.Settings.ManualTagLoadingMode = checkBoxManualTagLoading.Checked;
+            Program.Settings.LoadTranslationOnStartup = checkBoxLoadTranslationOnStartup.Checked;
             Program.Settings.AutocompleteMode = Extensions.GetEnumItemFromFriendlyText<AutocompleteMode>(comboAutocompMode.SelectedItem.ToString());
             Program.Settings.AutocompleteSort = Extensions.GetEnumItemFromFriendlyText<AutocompleteSort>(comboAutocompSort.SelectedItem.ToString());
             Program.Settings.FixTagsOnSaveLoad = checkBoxFixOnLoad.Checked;
@@ -339,6 +341,31 @@ namespace BooruDatasetTagManager
             {
                 buttonReloadTags.Enabled = true;
                 buttonReloadTags.Text = "Reload tags from files";
+            }
+        }
+
+        private async void ButtonLoadTranslation_Click(object sender, EventArgs e)
+        {
+            buttonLoadTranslation.Enabled = false;
+            buttonLoadTranslation.Text = "Loading...";
+            
+            try
+            {
+                await Task.Run(() =>
+                {
+                    Program.TagsList.LoadTranslation(Program.TransManager);
+                });
+                
+                MessageBox.Show("翻译已加载");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("加载翻译时出错: " + ex.Message);
+            }
+            finally
+            {
+                buttonLoadTranslation.Enabled = true;
+                buttonLoadTranslation.Text = "Load translation";
             }
         }
     }

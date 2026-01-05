@@ -88,10 +88,13 @@ namespace BooruDatasetTagManager
             debugToolStripMenuItem.Visible = true;
 #endif
             
-            await Task.Run(() =>
+            if (Program.Settings.LoadTranslationOnStartup)
             {
-                Program.TagsList.LoadTranslation(Program.TransManager);
-            });
+                await Task.Run(() =>
+                {
+                    Program.TagsList.LoadTranslation(Program.TransManager);
+                });
+            }
         }
 
         private void ContextMenuImageGridHeader_ItemClicked(object sender, ToolStripItemClickedEventArgs e)

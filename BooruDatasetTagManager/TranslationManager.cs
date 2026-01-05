@@ -145,11 +145,6 @@ namespace BooruDatasetTagManager
             return _translationDict.ContainsKey(orig.ToLower());
         }
 
-        public bool Contains(long hash)
-        {
-            return _hashSet.Contains(hash);
-        }
-
         public string GetTranslation(string text)
         {
             string result;

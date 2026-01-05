@@ -68,6 +68,7 @@ namespace BooruDatasetTagManager
             textBoxTranslationFile = new System.Windows.Forms.TextBox();
             buttonBrowseTranslationFile = new System.Windows.Forms.Button();
             buttonReloadTags = new System.Windows.Forms.Button();
+            buttonLoadTranslation = new System.Windows.Forms.Button();
             labelHotkeysHelp = new System.Windows.Forms.Label();
             dataGridViewHotkeys = new System.Windows.Forms.DataGridView();
             CmdId = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -402,8 +403,18 @@ namespace BooruDatasetTagManager
             this.checkBoxManualTagLoading.Name = "checkBoxManualTagLoading";
             this.checkBoxManualTagLoading.Size = new System.Drawing.Size(180, 21);
             this.checkBoxManualTagLoading.TabIndex = 31;
-            this.checkBoxManualTagLoading.Text = "Manual Tag Loading Mode";
+            this.checkBoxManualTagLoading.Text = "SettingManualTagLoading";
             this.checkBoxManualTagLoading.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxLoadTranslationOnStartup
+            // 
+            this.checkBoxLoadTranslationOnStartup.AutoSize = true;
+            this.checkBoxLoadTranslationOnStartup.Location = new System.Drawing.Point(15, 500);
+            this.checkBoxLoadTranslationOnStartup.Name = "checkBoxLoadTranslationOnStartup";
+            this.checkBoxLoadTranslationOnStartup.Size = new System.Drawing.Size(200, 21);
+            this.checkBoxLoadTranslationOnStartup.TabIndex = 32;
+            this.checkBoxLoadTranslationOnStartup.Text = "SettingLoadTranslationOnStartup";
+            this.checkBoxLoadTranslationOnStartup.UseVisualStyleBackColor = true;
             // 
             // checkBoxLoadOnlyManual
             // 
@@ -569,6 +580,7 @@ namespace BooruDatasetTagManager
             this.tabGeneral.Controls.Add(comboAutocompMode);
             this.tabGeneral.Controls.Add(LabelAutocompSort);
             this.tabGeneral.Controls.Add(buttonReloadTags);
+            this.tabGeneral.Controls.Add(buttonLoadTranslation);
             tabGeneral.Location = new System.Drawing.Point(1, 23);
             tabGeneral.Name = "tabGeneral";
             tabGeneral.Size = new System.Drawing.Size(628, 403);
@@ -591,9 +603,20 @@ namespace BooruDatasetTagManager
             buttonReloadTags.Name = "buttonReloadTags";
             buttonReloadTags.Size = new System.Drawing.Size(200, 30);
             buttonReloadTags.TabIndex = 12;
-            buttonReloadTags.Text = "Reload tags from files";
+            buttonReloadTags.Text = "SettingBtnReloadTags";
             buttonReloadTags.UseVisualStyleBackColor = true;
             buttonReloadTags.Click += ButtonReloadTags_Click;
+            // 
+            // buttonLoadTranslation
+            // 
+            buttonLoadTranslation.AutoSize = true;
+            buttonLoadTranslation.Location = new System.Drawing.Point(15, 363);
+            buttonLoadTranslation.Name = "buttonLoadTranslation";
+            buttonLoadTranslation.Size = new System.Drawing.Size(200, 30);
+            buttonLoadTranslation.TabIndex = 13;
+            buttonLoadTranslation.Text = "SettingBtnLoadTranslation";
+            buttonLoadTranslation.UseVisualStyleBackColor = true;
+            buttonLoadTranslation.Click += ButtonLoadTranslation_Click;
             // 
             // textBox4
             // 
@@ -859,6 +882,7 @@ namespace BooruDatasetTagManager
             Controls.Add(BtnCancel);
             Controls.Add(BtnSave);
             Controls.Add(checkBoxManualTagLoading);
+            Controls.Add(checkBoxLoadTranslationOnStartup);
             Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             Name = "Form_settings";
             StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -898,6 +922,7 @@ namespace BooruDatasetTagManager
         private System.Windows.Forms.ComboBox comboBox2;
         private System.Windows.Forms.CheckBox checkBoxLoadOnlyManual;
         private System.Windows.Forms.CheckBox checkBoxManualTagLoading;
+        private System.Windows.Forms.CheckBox checkBoxLoadTranslationOnStartup;
         private System.Windows.Forms.CheckBox checkBoxOfflineMode;
         private System.Windows.Forms.Label labelTranslationFile;
         private System.Windows.Forms.TextBox textBoxTranslationFile;
@@ -959,5 +984,6 @@ namespace BooruDatasetTagManager
         private System.Windows.Forms.NumericUpDown numericUpDownOpenAiTimeout;
         private System.Windows.Forms.Label labelOpenAiTimeout;
         private System.Windows.Forms.Button buttonReloadTags;
+        private System.Windows.Forms.Button buttonLoadTranslation;
     }
 }

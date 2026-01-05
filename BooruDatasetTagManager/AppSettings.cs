@@ -20,6 +20,7 @@ namespace BooruDatasetTagManager
         public bool OfflineTranslationMode { get; set; } = false;
         public string TranslationFilePath { get; set; } = "";
         public bool ManualTagLoadingMode { get; set; } = true;
+        public bool LoadTranslationOnStartup { get; set; } = true;
         public AutocompleteMode AutocompleteMode { get; set; } = AutocompleteMode.StartWith;
         public AutocompleteSort AutocompleteSort { get; set; } = AutocompleteSort.Alphabetical;
         public bool FixTagsOnSaveLoad { get; set; } = true;
