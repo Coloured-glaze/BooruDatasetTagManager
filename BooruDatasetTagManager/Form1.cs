@@ -17,6 +17,7 @@ namespace BooruDatasetTagManager
 {
     public partial class MainForm : Form
     {
+        private bool cancelTagGeneration = false;
         public MainForm()
         {
             InitializeComponent();
@@ -692,6 +693,13 @@ namespace BooruDatasetTagManager
         private void SetStatus(string text)
         {
             statusLabel.Text = text;
+        }
+
+        private void statusLabel_Click(object sender, EventArgs e)
+        {
+            // 当用户点击状态栏时，设置取消标志
+            cancelTagGeneration = true;
+            SetStatus(I18n.GetText("CancellingTagGeneration"));
         }
 
         private void SetDSCountStatus(string text)
@@ -2105,7 +2113,11 @@ namespace BooruDatasetTagManager
                 settings = Program.Settings.AutoTagger;
             else
                 settings = Program.Settings.OpenAiAutoTagger;
-            SetStatus(I18n.GetText("InProgress"));
+            
+            // 重置取消标志
+            cancelTagGeneration = false;
+            
+            SetStatus(I18n.GetText("InProgress") + " (" + I18n.GetText("ClickToCancel") + ")");
             StringBuilder sbErrors = new StringBuilder();
             LockEdit(true);
             List<DataItem> selectedTagsList = new List<DataItem>();
@@ -2126,6 +2138,13 @@ namespace BooruDatasetTagManager
             int currentIndex = 0;
             foreach (var item in selectedTagsList)
             {
+                // 检查是否取消
+                if (cancelTagGeneration)
+                {
+                    SetStatus(I18n.GetText("TagGenerationCancelled"));
+                    break;
+                }
+                
                 (List<AiApiClient.AutoTagItem> data, string errorMessage) taggerResult = (null, null);
                 if (!useOpenAi)
                     taggerResult = await Program.AutoTagger.GetTagsWithAutoTagger(item.ImageFilePath, defSettings);
@@ -2138,6 +2157,11 @@ namespace BooruDatasetTagManager
                     // 如果用户取消了设置窗口，保持defSettings为false，以便下一张图片可以重新打开设置窗口
                     if (taggerResult.data != null || (!string.IsNullOrEmpty(taggerResult.errorMessage) && taggerResult.errorMessage != I18n.GetText("TipGenCancel")))
                         defSettings = true;
+                    else if (taggerResult.errorMessage == I18n.GetText("TipGenCancel"))
+                    {
+                        // 如果用户取消了设置窗口，设置全局取消标志
+                        cancelTagGeneration = true;
+                    }
                 }
                 if (!string.IsNullOrEmpty(taggerResult.errorMessage) && taggerResult.errorMessage != I18n.GetText("TipGenCancel"))
                     SetStatus(taggerResult.errorMessage);
@@ -2188,7 +2212,10 @@ namespace BooruDatasetTagManager
                 sbErrors.Insert(0, "The following files were not processed (see ApiServer log):\n");
                 MessageBox.Show(sbErrors.ToString());
             }
-            SetStatus(I18n.GetText("TipProgressComplete"));
+            if (!cancelTagGeneration)
+            {
+                SetStatus(I18n.GetText("TipProgressComplete"));
+            }
         }
 
         private async Task<bool> CropImages()

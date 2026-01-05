@@ -1,4 +1,4 @@
-﻿BtnImageExitFilter=Exit dataset filter
+BtnImageExitFilter=Exit dataset filter
 BtnImageFilter=Filter in dataset
 BtnMenuGenTagsWithCurrentSettings=Generate tags with current settings (AiApiServer)
 BtnMenuGenTagsWithSetWindow=Generate tags with settings window... (AiApiServer)
@@ -271,3 +271,6 @@ LoadingSettingsReadMetadata=Attempt to read tags from image metadata (Images wit
 MenuItemLoadFolderWithSettings=Load folder with additional settings...
 LabelShownDsImages=Showing {0}/{1}
 InProgressCount=In progress, please wait ({0}/{1})...
+TagGenerationCancelled=Tag generation cancelled
+CancellingTagGeneration=Cancelling tag generation...
+ClickToCancel=Click status bar to cancel

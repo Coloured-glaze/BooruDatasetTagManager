@@ -1,4 +1,4 @@
-﻿
+
 namespace BooruDatasetTagManager
 {
     partial class MainForm
@@ -995,9 +995,11 @@ namespace BooruDatasetTagManager
             // 
             // statusLabel
             // 
+            statusLabel.BorderStyle = System.Windows.Forms.Border3DStyle.Sunken;
             statusLabel.Name = "statusLabel";
             statusLabel.Size = new System.Drawing.Size(12, 17);
             statusLabel.Text = "-";
+            statusLabel.Click += statusLabel_Click;
             // 
             // splitContainer1
             // 

@@ -65,11 +65,11 @@ namespace BooruDatasetTagManager
                 if (item.Trim().StartsWith("//"))
                     continue;
                 var transItem = TransItem.Create(item, _isCsvFormat);
-                if (transItem != null && !_hashSet.Contains(transItem.OrigHash))
+                if (transItem != null && !_hashSet.Contains(transItem.NormalizedHash))
                 {
                     Translations.Add(transItem);
-                    _hashSet.Add(transItem.OrigHash);
-                    _translationDict[transItem.OrigHash] = transItem.Trans;
+                    _hashSet.Add(transItem.NormalizedHash);
+                    _translationDict[transItem.NormalizedHash] = transItem.Trans;
                 }
             }
         }
@@ -102,6 +102,16 @@ namespace BooruDatasetTagManager
                 sw.WriteLine(line);
             }
             sw.Dispose();
+            
+            // 更新格式标志和文件路径
+            _isCsvFormat = false;
+            translationFilePath = txtFilePath;
+            
+            // 重新加载翻译，确保哈希计算正确
+            Translations.Clear();
+            _hashSet.Clear();
+            _translationDict.Clear();
+            LoadTranslations();
         }
 
         public bool Contains(string orig)
@@ -133,7 +143,7 @@ namespace BooruDatasetTagManager
         {
             if (onlyManual)
             {
-                var res = Translations.FirstOrDefault(a => a.OrigHash == hash && a.IsManual == onlyManual);
+                var res = Translations.FirstOrDefault(a => a.NormalizedHash == hash && a.IsManual == onlyManual);
                 if (res == null)
                     return null;
                 return res.Trans;
@@ -183,10 +193,10 @@ namespace BooruDatasetTagManager
                 line = $"{(isManual ? "*" : "")}{orig}={trans}";
             }
             File.AppendAllText(translationFilePath, line + "\r\n", Encoding.UTF8);
-            var newItem = new TransItem(orig, trans, isManual);
+            var newItem = new TransItem(orig, trans, isManual, _isCsvFormat);
             Translations.Add(newItem);
-            _hashSet.Add(newItem.OrigHash);
-            _translationDict[newItem.OrigHash] = trans;
+            _hashSet.Add(newItem.NormalizedHash);
+            _translationDict[newItem.NormalizedHash] = trans;
         }
 
         public async Task AddTranslationAsync(string orig, string trans, bool isManual)
@@ -204,10 +214,10 @@ namespace BooruDatasetTagManager
             }
             await sw.WriteLineAsync(line);
             sw.Close();
-            var newItem = new TransItem(orig, trans, isManual);
+            var newItem = new TransItem(orig, trans, isManual, _isCsvFormat);
             Translations.Add(newItem);
-            _hashSet.Add(newItem.OrigHash);
-            _translationDict[newItem.OrigHash] = trans;
+            _hashSet.Add(newItem.NormalizedHash);
+            _translationDict[newItem.NormalizedHash] = trans;
         }
 
         public async Task<string> TranslateAsync(string text)
@@ -247,13 +257,18 @@ namespace BooruDatasetTagManager
             public string Trans {get; set; }
             public long OrigHash { get; private set; }
             public bool IsManual { get; private set; }
+            public long NormalizedHash { get; private set; }
 
-            public TransItem(string orig, string trans, bool isManual)
+            public TransItem(string orig, string trans, bool isManual, bool isCsvFormat = false)
             {
                 Orig = orig;
                 Trans = trans;
                 OrigHash = orig.ToLower().GetHash();
                 IsManual = isManual;
+                
+                // 计算标准化哈希，用于查找
+                string normalizedText = isCsvFormat ? orig.Replace(" ", "_") : orig;
+                NormalizedHash = normalizedText.ToLower().Trim().GetHash();
             }
 
             public static TransItem Create(string text, bool isCsvFormat = false)
@@ -285,7 +300,7 @@ namespace BooruDatasetTagManager
                     orig = orig.Replace("_", " ");
                 }
                 
-                return new TransItem(orig, trans, manual);
+                return new TransItem(orig, trans, manual, isCsvFormat);
             }
 
 
