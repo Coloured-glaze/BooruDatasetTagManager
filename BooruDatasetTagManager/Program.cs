@@ -20,7 +20,7 @@ namespace BooruDatasetTagManager
         /// Главная точка входа для приложения.
         /// </summary>
         [STAThread]
-        static async void Main()
+        static void Main()
         {
             PreloadDotnetDependenciesFromSubdirectoryManually();
             Application.EnableVisualStyles();
@@ -40,7 +40,7 @@ namespace BooruDatasetTagManager
             I18n.Initialize(Program.Settings.Language);
             Settings.Hotkeys.ChangeLanguage();
             
-            await Task.Run(() =>
+            Task.Run(() =>
             {
                 string translationsDir = Path.Combine(Application.StartupPath, "Translations");
                 if (!Directory.Exists(translationsDir))
@@ -55,7 +55,7 @@ namespace BooruDatasetTagManager
                 if (TagsList == null)
                     TagsList = new TagsDB();
                 TagsList.LoadTranslation(TransManager);
-            });
+            }).GetAwaiter().GetResult();
             AutoTagger = new AiApiClient();
             if (!string.IsNullOrEmpty(Settings.OpenAiAutoTagger.ConnectionAddress) && !string.IsNullOrEmpty(Settings.OpenAiAutoTagger.ApiKey))
             {
