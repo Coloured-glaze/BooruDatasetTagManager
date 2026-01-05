@@ -60,6 +60,7 @@ SettingTabTranslations=Translations
 SettingTabUI=UI
 SettingTranslationLanguage=Translation Language
 SettingTranslationOnlyManual=Load only manual translations into autocomplete
+SettingManualTagLoading=Manual Load Tag autocomplete
 SettingTranslationService=Translation Service
 SettingUILanguage=UI Language
 SettingUIRowHeight=Tags row height

@@ -64,12 +64,36 @@ namespace BooruDatasetTagManager
             {
                 if (item.Trim().StartsWith("//"))
                     continue;
-                var transItem = TransItem.Create(item, _isCsvFormat);
-                if (transItem != null && !_hashSet.Contains(transItem.NormalizedHash))
+                
+                // 对于CSV格式，先转换为TXT格式的字符串
+                string txtLine = item;
+                if (_isCsvFormat)
+                {
+                    // 将CSV格式的行转换为TXT格式
+                    bool manual = false;
+                    string processLine = item;
+                    if (processLine.StartsWith("*"))
+                    {
+                        processLine = processLine.Substring(1);
+                        manual = true;
+                    }
+                    
+                    int commaIndex = processLine.LastIndexOf(',');
+                    if (commaIndex != -1)
+                    {
+                        string orig = processLine.Substring(0, commaIndex).Trim();
+                        string trans = processLine.Substring(commaIndex + 1).Trim();
+                        txtLine = (manual ? "*" : "") + orig + "=" + trans;
+                    }
+                }
+                
+                // 使用TXT格式创建TransItem
+                var transItem = TransItem.Create(txtLine, false);
+                if (transItem != null && !_hashSet.Contains(transItem.OrigHash))
                 {
                     Translations.Add(transItem);
-                    _hashSet.Add(transItem.NormalizedHash);
-                    _translationDict[transItem.NormalizedHash] = transItem.Trans;
+                    _hashSet.Add(transItem.OrigHash);
+                    _translationDict[transItem.OrigHash] = transItem.Trans;
                 }
             }
         }
@@ -116,7 +140,7 @@ namespace BooruDatasetTagManager
 
         public bool Contains(string orig)
         {
-            return _hashSet.Contains(GetNormalizedHash(orig));
+            return _hashSet.Contains(orig.ToLower().GetHash());
         }
 
         public bool Contains(long hash)
@@ -126,7 +150,7 @@ namespace BooruDatasetTagManager
 
         public string GetTranslation(string text)
         {
-            return GetTranslation(GetNormalizedHash(text));
+            return GetTranslation(text.ToLower().GetHash());
         }
 
         public string GetTranslation(long hash)
@@ -143,7 +167,7 @@ namespace BooruDatasetTagManager
         {
             if (onlyManual)
             {
-                var res = Translations.FirstOrDefault(a => a.NormalizedHash == hash && a.IsManual == onlyManual);
+                var res = Translations.FirstOrDefault(a => a.OrigHash == hash && a.IsManual == onlyManual);
                 if (res == null)
                     return null;
                 return res.Trans;
@@ -167,25 +191,12 @@ namespace BooruDatasetTagManager
             });
         }
 
-        private string GetNormalizedText(string text)
-        {
-            if (_isCsvFormat)
-            {
-                return text.Replace(" ", "_");
-            }
-            return text;
-        }
-
-        private long GetNormalizedHash(string text)
-        {
-            return GetNormalizedText(text).ToLower().Trim().GetHash();
-        }
         public void AddTranslation(string orig, string trans, bool isManual)
         {
-            string normalizedOrig = GetNormalizedText(orig);
             string line;
             if (_isCsvFormat)
             {
+                string normalizedOrig = orig.Replace(" ", "_");
                 line = $"{(isManual ? "*" : "")}{normalizedOrig},{trans}";
             }
             else
@@ -193,19 +204,19 @@ namespace BooruDatasetTagManager
                 line = $"{(isManual ? "*" : "")}{orig}={trans}";
             }
             File.AppendAllText(translationFilePath, line + "\r\n", Encoding.UTF8);
-            var newItem = new TransItem(orig, trans, isManual, _isCsvFormat);
+            var newItem = new TransItem(orig, trans, isManual, false);
             Translations.Add(newItem);
-            _hashSet.Add(newItem.NormalizedHash);
-            _translationDict[newItem.NormalizedHash] = trans;
+            _hashSet.Add(newItem.OrigHash);
+            _translationDict[newItem.OrigHash] = trans;
         }
 
         public async Task AddTranslationAsync(string orig, string trans, bool isManual)
         {
-            string normalizedOrig = GetNormalizedText(orig);
             StreamWriter sw = new StreamWriter(translationFilePath, true, Encoding.UTF8);
             string line;
             if (_isCsvFormat)
             {
+                string normalizedOrig = orig.Replace(" ", "_");
                 line = $"{(isManual ? "*" : "")}{normalizedOrig},{trans}";
             }
             else
@@ -214,10 +225,10 @@ namespace BooruDatasetTagManager
             }
             await sw.WriteLineAsync(line);
             sw.Close();
-            var newItem = new TransItem(orig, trans, isManual, _isCsvFormat);
+            var newItem = new TransItem(orig, trans, isManual, false);
             Translations.Add(newItem);
-            _hashSet.Add(newItem.NormalizedHash);
-            _translationDict[newItem.NormalizedHash] = trans;
+            _hashSet.Add(newItem.OrigHash);
+            _translationDict[newItem.OrigHash] = trans;
         }
 
         public async Task<string> TranslateAsync(string text)
@@ -242,7 +253,7 @@ namespace BooruDatasetTagManager
             }
             
             string originalText = text;
-            string normalizedText = GetNormalizedText(text);
+            string normalizedText = _isCsvFormat ? text.Replace(" ", "_") : text;
             result = await translator.TranslateAsync(originalText, "en", _language);
             if (!string.IsNullOrEmpty(result))
                 await AddTranslationAsync(normalizedText, result, false);
@@ -257,7 +268,6 @@ namespace BooruDatasetTagManager
             public string Trans {get; set; }
             public long OrigHash { get; private set; }
             public bool IsManual { get; private set; }
-            public long NormalizedHash { get; private set; }
 
             public TransItem(string orig, string trans, bool isManual, bool isCsvFormat = false)
             {
@@ -265,10 +275,6 @@ namespace BooruDatasetTagManager
                 Trans = trans;
                 OrigHash = orig.ToLower().GetHash();
                 IsManual = isManual;
-                
-                // 计算标准化哈希，用于查找
-                string normalizedText = isCsvFormat ? orig.Replace(" ", "_") : orig;
-                NormalizedHash = normalizedText.ToLower().Trim().GetHash();
             }
 
             public static TransItem Create(string text, bool isCsvFormat = false)
@@ -279,28 +285,15 @@ namespace BooruDatasetTagManager
                     text = text.Substring(1);
                     manual = true;
                 }
-                int index;
-                if (isCsvFormat)
-                {
-                    index = text.LastIndexOf(',');
-                }
-                else
-                {
-                    index = text.LastIndexOf('=');
-                }
+                
+                int index = text.LastIndexOf('=');
                 if (index == -1)
                     return null;
+                    
                 string orig = text.Substring(0, index).Trim();
                 string trans = text.Substring(index + 1).Trim();
                 
-                // 对于CSV格式，原始文本已经包含了下划线替换，需要将下划线还原为空格
-                // 这样在查询时，GetNormalizedHash 会再次将空格替换为下划线，保证哈希一致
-                if (isCsvFormat)
-                {
-                    orig = orig.Replace("_", " ");
-                }
-                
-                return new TransItem(orig, trans, manual, isCsvFormat);
+                return new TransItem(orig, trans, manual, false);
             }
 
 

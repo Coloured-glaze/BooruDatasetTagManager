@@ -60,6 +60,7 @@ namespace BooruDatasetTagManager
             LabelAutocompFont = new System.Windows.Forms.Label();
             LabelTagFont = new System.Windows.Forms.Label();
             checkBoxLoadOnlyManual = new System.Windows.Forms.CheckBox();
+            checkBoxManualTagLoading = new System.Windows.Forms.CheckBox();
             labelTranslService = new System.Windows.Forms.Label();
             comboBox2 = new System.Windows.Forms.ComboBox();
             checkBoxOfflineMode = new System.Windows.Forms.CheckBox();
@@ -392,6 +393,16 @@ namespace BooruDatasetTagManager
             LabelTagFont.Size = new System.Drawing.Size(103, 15);
             LabelTagFont.TabIndex = 0;
             LabelTagFont.Text = "Tags gridview font";
+            // 
+            // checkBoxManualTagLoading
+            // 
+            this.checkBoxManualTagLoading.AutoSize = true;
+            this.checkBoxManualTagLoading.Location = new System.Drawing.Point(15, 475);
+            this.checkBoxManualTagLoading.Name = "checkBoxManualTagLoading";
+            this.checkBoxManualTagLoading.Size = new System.Drawing.Size(180, 21);
+            this.checkBoxManualTagLoading.TabIndex = 31;
+            this.checkBoxManualTagLoading.Text = "Manual Tag Loading Mode";
+            this.checkBoxManualTagLoading.UseVisualStyleBackColor = true;
             // 
             // checkBoxLoadOnlyManual
             // 
@@ -834,6 +845,7 @@ namespace BooruDatasetTagManager
             Controls.Add(SettingFrame);
             Controls.Add(BtnCancel);
             Controls.Add(BtnSave);
+            Controls.Add(checkBoxManualTagLoading);
             Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             Name = "Form_settings";
             StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
