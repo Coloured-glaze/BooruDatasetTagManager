@@ -884,6 +884,7 @@ namespace BooruDatasetTagManager
         private System.Windows.Forms.Label labelTranslService;
         private System.Windows.Forms.ComboBox comboBox2;
         private System.Windows.Forms.CheckBox checkBoxLoadOnlyManual;
+        private System.Windows.Forms.CheckBox checkBoxManualTagLoading;
         private System.Windows.Forms.CheckBox checkBoxOfflineMode;
         private System.Windows.Forms.Label labelTranslationFile;
         private System.Windows.Forms.TextBox textBoxTranslationFile;
