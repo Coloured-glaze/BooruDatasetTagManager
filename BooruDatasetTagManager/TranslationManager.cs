@@ -29,7 +29,7 @@ namespace BooruDatasetTagManager
             _workDir = workDir;
             Translations = new List<TransItem>();
             _hashSet = new HashSet<long>();
-            _translationDict = new Dictionary<string, string>();
+            _translationDict = new Dictionary<long, string>();
             _offlineMode = offlineMode;
             translator = AbstractTranslator.Create(service);
             if (!string.IsNullOrEmpty(customTranslationFile) && File.Exists(customTranslationFile))
@@ -162,10 +162,12 @@ namespace BooruDatasetTagManager
 
         public string GetTranslation(long hash)
         {
-            var res = Translations.FirstOrDefault(a => a.OrigHash == hash);
-            if (res == null)
-                return null;
-            return res.Trans;
+            string result;
+            if (_translationDict.TryGetValue(hash, out result))
+            {
+                return result;
+            }
+            return null;
         }
 
         public string GetTranslation(long hash, bool onlyManual)
@@ -179,10 +181,12 @@ namespace BooruDatasetTagManager
             }
             else
             {
-                var res = Translations.FirstOrDefault(a => a.OrigHash == hash);
-                if (res == null)
-                    return null;
-                return res.Trans;
+                string result;
+                if (_translationDict.TryGetValue(hash, out result))
+                {
+                    return result;
+                }
+                return null;
             }
         }
 

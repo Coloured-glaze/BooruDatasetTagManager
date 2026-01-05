@@ -299,5 +299,29 @@ namespace BooruDatasetTagManager
                 textBoxTranslationFile.Text = openFileDialog.FileName;
             }
         }
+
+        private async void ButtonReloadTags_Click(object sender, EventArgs e)
+        {
+            string tagsDir = Path.Combine(Application.StartupPath, "Tags");
+            if (!Directory.Exists(tagsDir))
+                Directory.CreateDirectory(tagsDir);
+            
+            string tagFile = Path.Combine(tagsDir, "List.tdb");
+            
+            if (Program.TagsList == null)
+                Program.TagsList = new TagsDB();
+            
+            Program.TagsList.SetNeedFixTags(Program.Settings.FixTagsOnSaveLoad);
+            Program.TagsList.ClearDb();
+            Program.TagsList.ClearLoadedFiles();
+            Program.TagsList.ResetVersion();
+            Program.TagsList.LoadCSVFromDir(tagsDir);
+            Program.TagsList.LoadTxtFromDir(tagsDir);
+            Program.TagsList.SortTags();
+            Program.TagsList.SaveTags(tagFile);
+            Program.TagsList.LoadTranslation(Program.TransManager);
+            
+            MessageBox.Show("标签数据已重新加载");
+        }
     }
 }

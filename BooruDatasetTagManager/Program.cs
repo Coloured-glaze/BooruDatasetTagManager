@@ -40,22 +40,20 @@ namespace BooruDatasetTagManager
             I18n.Initialize(Program.Settings.Language);
             Settings.Hotkeys.ChangeLanguage();
             
-            Task.Run(() =>
-            {
-                string translationsDir = Path.Combine(Application.StartupPath, "Translations");
-                if (!Directory.Exists(translationsDir))
-                    Directory.CreateDirectory(translationsDir);
-                TransManager = new TranslationManager(Program.Settings.TranslationLanguage, Program.Settings.TransService, translationsDir, Program.Settings.OfflineTranslationMode, Program.Settings.TranslationFilePath);
-                TransManager.LoadTranslations();
-                string tagsDir = Path.Combine(Application.StartupPath, "Tags");
-                if(!Directory.Exists(tagsDir))
-                    Directory.CreateDirectory(tagsDir);
-                string tagFile = Path.Combine(tagsDir, "List.tdb");
-                TagsList = TagsDB.LoadFromTagFile(tagFile);
-                if (TagsList == null)
-                    TagsList = new TagsDB();
-                TagsList.LoadTranslation(TransManager);
-            }).GetAwaiter().GetResult();
+            string translationsDir = Path.Combine(Application.StartupPath, "Translations");
+            if (!Directory.Exists(translationsDir))
+                Directory.CreateDirectory(translationsDir);
+            TransManager = new TranslationManager(Program.Settings.TranslationLanguage, Program.Settings.TransService, translationsDir, Program.Settings.OfflineTranslationMode, Program.Settings.TranslationFilePath);
+            TransManager.LoadTranslations();
+            
+            string tagsDir = Path.Combine(Application.StartupPath, "Tags");
+            if(!Directory.Exists(tagsDir))
+                Directory.CreateDirectory(tagsDir);
+            string tagFile = Path.Combine(tagsDir, "List.tdb");
+            TagsList = TagsDB.LoadFromTagFile(tagFile);
+            if (TagsList == null)
+                TagsList = new TagsDB();
+            TagsList.LoadTranslation(TransManager);
             AutoTagger = new AiApiClient();
             if (!string.IsNullOrEmpty(Settings.OpenAiAutoTagger.ConnectionAddress) && !string.IsNullOrEmpty(Settings.OpenAiAutoTagger.ApiKey))
             {

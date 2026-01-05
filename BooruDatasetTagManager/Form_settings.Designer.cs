@@ -67,6 +67,7 @@ namespace BooruDatasetTagManager
             labelTranslationFile = new System.Windows.Forms.Label();
             textBoxTranslationFile = new System.Windows.Forms.TextBox();
             buttonBrowseTranslationFile = new System.Windows.Forms.Button();
+            buttonReloadTags = new System.Windows.Forms.Button();
             labelHotkeysHelp = new System.Windows.Forms.Label();
             dataGridViewHotkeys = new System.Windows.Forms.DataGridView();
             CmdId = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -547,26 +548,27 @@ namespace BooruDatasetTagManager
             // 
             // tabGeneral
             // 
-            tabGeneral.Controls.Add(checkBoxFixOnLoad);
-            tabGeneral.Controls.Add(AutoSortCheckBox);
-            tabGeneral.Controls.Add(LabelPreviewImageSize);
-            tabGeneral.Controls.Add(CheckAskChange);
-            tabGeneral.Controls.Add(numericUpDown1);
-            tabGeneral.Controls.Add(textBox4);
-            tabGeneral.Controls.Add(textBox3);
-            tabGeneral.Controls.Add(textBox2);
-            tabGeneral.Controls.Add(numericUpDown2);
-            tabGeneral.Controls.Add(labelCaptionFileExt);
-            tabGeneral.Controls.Add(labelDelExt);
-            tabGeneral.Controls.Add(LabelSeparatorSave);
-            tabGeneral.Controls.Add(LabelAutocompAfter);
-            tabGeneral.Controls.Add(textBox1);
-            tabGeneral.Controls.Add(LabelChars);
-            tabGeneral.Controls.Add(LabelSeparatorLoad);
-            tabGeneral.Controls.Add(LabelAutocompMode);
-            tabGeneral.Controls.Add(comboAutocompSort);
-            tabGeneral.Controls.Add(comboAutocompMode);
-            tabGeneral.Controls.Add(LabelAutocompSort);
+            this.tabGeneral.Controls.Add(checkBoxFixOnLoad);
+            this.tabGeneral.Controls.Add(AutoSortCheckBox);
+            this.tabGeneral.Controls.Add(LabelPreviewImageSize);
+            this.tabGeneral.Controls.Add(CheckAskChange);
+            this.tabGeneral.Controls.Add(numericUpDown1);
+            this.tabGeneral.Controls.Add(textBox4);
+            this.tabGeneral.Controls.Add(textBox3);
+            this.tabGeneral.Controls.Add(textBox2);
+            this.tabGeneral.Controls.Add(numericUpDown2);
+            this.tabGeneral.Controls.Add(labelCaptionFileExt);
+            this.tabGeneral.Controls.Add(labelDelExt);
+            this.tabGeneral.Controls.Add(LabelSeparatorSave);
+            this.tabGeneral.Controls.Add(LabelAutocompAfter);
+            this.tabGeneral.Controls.Add(textBox1);
+            this.tabGeneral.Controls.Add(LabelChars);
+            this.tabGeneral.Controls.Add(LabelSeparatorLoad);
+            this.tabGeneral.Controls.Add(LabelAutocompMode);
+            this.tabGeneral.Controls.Add(comboAutocompSort);
+            this.tabGeneral.Controls.Add(comboAutocompMode);
+            this.tabGeneral.Controls.Add(LabelAutocompSort);
+            this.tabGeneral.Controls.Add(buttonReloadTags);
             tabGeneral.Location = new System.Drawing.Point(1, 23);
             tabGeneral.Name = "tabGeneral";
             tabGeneral.Size = new System.Drawing.Size(628, 403);
@@ -581,6 +583,17 @@ namespace BooruDatasetTagManager
             checkBoxFixOnLoad.TabIndex = 11;
             checkBoxFixOnLoad.Text = resources.GetString("checkBoxFixOnLoad.Text");
             checkBoxFixOnLoad.UseVisualStyleBackColor = true;
+            // 
+            // buttonReloadTags
+            // 
+            buttonReloadTags.AutoSize = true;
+            buttonReloadTags.Location = new System.Drawing.Point(15, 327);
+            buttonReloadTags.Name = "buttonReloadTags";
+            buttonReloadTags.Size = new System.Drawing.Size(200, 30);
+            buttonReloadTags.TabIndex = 12;
+            buttonReloadTags.Text = "Reload tags from files";
+            buttonReloadTags.UseVisualStyleBackColor = true;
+            buttonReloadTags.Click += ButtonReloadTags_Click;
             // 
             // textBox4
             // 
@@ -945,5 +958,6 @@ namespace BooruDatasetTagManager
         private System.Windows.Forms.Label labelOpenAiApiKey;
         private System.Windows.Forms.NumericUpDown numericUpDownOpenAiTimeout;
         private System.Windows.Forms.Label labelOpenAiTimeout;
+        private System.Windows.Forms.Button buttonReloadTags;
     }
 }
