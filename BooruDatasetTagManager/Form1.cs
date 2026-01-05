@@ -2733,7 +2733,7 @@ namespace BooruDatasetTagManager
             Program.TagsList.SaveTags(tagFile);
             Program.TagsList.LoadTranslation(Program.TransManager);
             
-            RefreshAllTagsList();
+            gridViewAllTags.Refresh();
             SetStatus("标签数据已重新加载");
         }
 
