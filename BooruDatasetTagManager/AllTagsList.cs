@@ -24,6 +24,7 @@ namespace BooruDatasetTagManager
         private PropertyDescriptor _propertyDescriptor;
         private ListSortDirection _sortDirection = ListSortDirection.Ascending;
         private bool isTranslating = false;
+        private int suspendListChangedCount = 0;
 
         public AllTagsItem this[int index]
         {
@@ -164,13 +165,14 @@ namespace BooruDatasetTagManager
 
         public void AddRange(IEnumerable<AllTagsItem> items)
         {
+            SuspendListChanged();
             foreach (var item in items)
             {
                 item.Parent = this;
                 tagsList.Add(item);
                 List.Add(item);
             }
-            OnListChanged(resetEvent);
+            ResumeListChanged();
         }
 
         public string[] GetAllTagsList()
@@ -333,9 +335,26 @@ namespace BooruDatasetTagManager
 
         protected virtual void OnListChanged(ListChangedEventArgs ev)
         {
-            if (onListChanged != null)
+            if (onListChanged != null && suspendListChangedCount == 0)
             {
                 onListChanged(this, ev);
+            }
+        }
+
+        public void SuspendListChanged()
+        {
+            suspendListChangedCount++;
+        }
+
+        public void ResumeListChanged()
+        {
+            if (suspendListChangedCount > 0)
+            {
+                suspendListChangedCount--;
+                if (suspendListChangedCount == 0)
+                {
+                    OnListChanged(resetEvent);
+                }
             }
         }
 
