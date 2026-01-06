@@ -305,8 +305,8 @@ namespace BooruDatasetTagManager
                         }
                     }
                     
-                    // 每处理10行更新一次UI，避免过于频繁的更新
-                    if (i % 10 == 0 || i == grid.RowCount - 1)
+                    // 每处理20行更新一次UI，避免过于频繁的更新
+                    if (i % 20 == 0 || i == grid.RowCount - 1)
                     {
                         Application.DoEvents();
                     }

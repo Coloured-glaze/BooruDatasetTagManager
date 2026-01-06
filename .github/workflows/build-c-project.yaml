@@ -148,13 +148,11 @@ jobs:
 
       - name: Build Solution
         run: |
-          msbuild BooruDatasetTagManager.sln `
-            /p:Configuration=${{ inputs.configuration }} `
-            /p:Platform="Any CPU" `
-            /p:TargetFramework=net8.0-windows `
-            /p:GitCommit=${{ github.sha }} `
-            /t:Build `
-            /v:minimal
+          dotnet build BooruDatasetTagManager.sln `
+            --configuration ${{ inputs.configuration }} `
+            --property:GitCommit=${{ github.sha }} `
+            /p:TargetFramework=net8.0-windows
+
 
       - name: Publish application
         shell: powershell
@@ -163,10 +161,10 @@ jobs:
           dotnet publish BooruDatasetTagManager/BooruDatasetTagManager.csproj `
             --configuration ${{ inputs.configuration }} `
             --runtime ${{ inputs.runtime }} `
+            --property:GitCommit=${{ github.sha }} `
             $selfContained `
             --output publish `
             /p:TargetFramework=net8.0-windows `
-            /p:GitCommit=${{ github.sha }} `
             /p:PublishSingleFile=true `
             /p:EnableCompressionInSingleFile=true
 
