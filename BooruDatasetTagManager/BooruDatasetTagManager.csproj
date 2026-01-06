@@ -27,23 +27,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
-      <_Parameter1>GitCommit</_Parameter1>
-      <_Parameter2>$(SourceRevisionId)</_Parameter2>
-    </AssemblyAttribute>
   </ItemGroup>
 
-  <Target Name="GenerateGitCommitMetadata" BeforeTargets="CoreCompile">
+  <Target Name="UpdateGitCommitMetadata" BeforeTargets="CoreCompile">
     <PropertyGroup>
-      <GitCommitMetadataFile>$(IntermediateOutputPath)GitCommitMetadata.cs</GitCommitMetadataFile>
+      <AssemblyInfoFile>$(ProjectDir)Properties\AssemblyInfo.cs</AssemblyInfoFile>
     </PropertyGroup>
-    <WriteLinesToFile File="$(GitCommitMetadataFile)" Lines="using System.Reflection;" Overwrite="true" />
-    <WriteLinesToFile File="$(GitCommitMetadataFile)" Lines="[assembly: AssemblyMetadata(&quot;GitCommit&quot;, &quot;$(SourceRevisionId)&quot;)]" Overwrite="false" />
-    <ItemGroup>
-      <Compile Include="$(GitCommitMetadataFile)" />
-    </ItemGroup>
-    <Message Text="Generated GitCommit metadata file: $(GitCommitMetadataFile)" Importance="high" />
-    <Message Text="GitCommit value: $(SourceRevisionId)" Importance="high" />
+    <Exec Command="powershell -Command &quot;(Get-Content '$(AssemblyInfoFile)') -replace '\[assembly: AssemblyMetadata\(&quot;GitCommit&quot;, &quot;.*?&quot;\)\]', '[assembly: AssemblyMetadata(&quot;GitCommit&quot;, &quot;$(SourceRevisionId)&quot;)]' | Set-Content '$(AssemblyInfoFile)'&quot;" />
+    <Message Text="Updated GitCommit metadata to: $(SourceRevisionId)" Importance="high" />
   </Target>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0-windows|AnyCPU'">
     <NoWarn>1701;1702;CA1416;NU1701</NoWarn>
