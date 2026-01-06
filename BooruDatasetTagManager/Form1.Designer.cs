@@ -1766,7 +1766,6 @@ namespace BooruDatasetTagManager
         private ToolStripCustomMenuItem toolStripMenuItemWeight;
         private System.Windows.Forms.ToolStripTextBox toolStripTextBoxWeight;
         private System.Windows.Forms.ToolStripMenuItem generateTagsWithAutoTaggerForAllImagesToolStripMenuItem;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator12;
         private System.Windows.Forms.ToolStripButton btnAutoAddSelToImageTags;
         private Manina.Windows.Forms.Tab tabPreview;
         private System.Windows.Forms.PictureBox pictureBoxPreview;

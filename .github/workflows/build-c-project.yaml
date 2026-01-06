@@ -73,6 +73,10 @@ jobs:
         # with:
         #   submodules: "recursive"
 
+      - name: Print commit hash
+        run: |
+          git rev-parse HEAD
+
       # - name: Clone ScreenLister dependency
       #   run: |
           # git clone https://github.com/starik222/ScreenLister.git ScreenLister
