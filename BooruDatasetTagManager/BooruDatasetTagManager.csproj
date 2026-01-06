@@ -25,7 +25,7 @@
     <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
   </PropertyGroup>
 
-  <Target Name="GetGitCommit" BeforeTargets="CoreCompile">
+  <Target Name="GetGitCommit" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <GitCommit Condition="'$(GitCommit)' == ''">unknown</GitCommit>
     </PropertyGroup>
@@ -34,12 +34,15 @@
     </Exec>
   </Target>
 
-  <ItemGroup>
-    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
-      <_Parameter1>GitCommit</_Parameter1>
-      <_Parameter2>$(GitCommit)</_Parameter2>
-    </AssemblyAttribute>
-  </ItemGroup>
+  <Target Name="SetGitCommitMetadata" AfterTargets="GetGitCommit">
+    <ItemGroup>
+      <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+        <_Parameter1>GitCommit</_Parameter1>
+        <_Parameter2>$(GitCommit)</_Parameter2>
+      </AssemblyAttribute>
+    </ItemGroup>
+  </Target>
+
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0-windows|AnyCPU'">
     <NoWarn>1701;1702;CA1416;NU1701</NoWarn>
   </PropertyGroup>
