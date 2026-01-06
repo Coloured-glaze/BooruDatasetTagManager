@@ -102,19 +102,22 @@ namespace BooruDatasetTagManager
                 Program.TagsList.SortTags();
                 Program.TagsList.LoadTranslation(Program.TransManager);
                 
-                Program.DataManager.AllTags.Clear();
-                var allTagItems = new List<AllTagsItem>();
-                foreach (var tag in Program.TagsList.Tags)
+                if (Program.DataManager != null)
                 {
-                    if (!tag.IsAlias)
+                    Program.DataManager.AllTags.Clear();
+                    var allTagItems = new List<AllTagsItem>();
+                    foreach (var tag in Program.TagsList.Tags)
                     {
-                        var allTagItem = new AllTagsItem(tag.Tag);
-                        allTagItem.Count = tag.Count;
-                        allTagItem.SetTranslation(tag.Translation);
-                        allTagItems.Add(allTagItem);
+                        if (!tag.IsAlias)
+                        {
+                            var allTagItem = new AllTagsItem(tag.Tag);
+                            allTagItem.Count = tag.Count;
+                            allTagItem.SetTranslation(tag.Translation);
+                            allTagItems.Add(allTagItem);
+                        }
                     }
+                    Program.DataManager.AllTags.AddRange(allTagItems);
                 }
-                Program.DataManager.AllTags.AddRange(allTagItems);
             });
         }
 

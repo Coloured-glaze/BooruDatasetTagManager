@@ -166,6 +166,7 @@ jobs:
             $selfContained `
             --output publish `
             /p:TargetFramework=net8.0-windows `
+            /p:GitCommit=${{ github.sha }} `
             /p:PublishSingleFile=true `
             /p:EnableCompressionInSingleFile=true
 
