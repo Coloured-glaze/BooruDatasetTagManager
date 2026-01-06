@@ -60,7 +60,6 @@ namespace BooruDatasetTagManager
             LabelAutocompFont = new System.Windows.Forms.Label();
             LabelTagFont = new System.Windows.Forms.Label();
             checkBoxLoadOnlyManual = new System.Windows.Forms.CheckBox();
-            checkBoxManualTagLoading = new System.Windows.Forms.CheckBox();
             labelTranslService = new System.Windows.Forms.Label();
             comboBox2 = new System.Windows.Forms.ComboBox();
             checkBoxOfflineMode = new System.Windows.Forms.CheckBox();
@@ -689,7 +688,6 @@ namespace BooruDatasetTagManager
             // 
             tabTranslations.Controls.Add(checkBoxLoadOnlyManual);
             tabTranslations.Controls.Add(checkBoxOfflineMode);
-            tabTranslations.Controls.Add(checkBoxManualTagLoading);
             tabTranslations.Controls.Add(labelTranslationFile);
             tabTranslations.Controls.Add(textBoxTranslationFile);
             tabTranslations.Controls.Add(buttonBrowseTranslationFile);

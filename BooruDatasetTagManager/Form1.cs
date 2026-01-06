@@ -1505,7 +1505,7 @@ namespace BooruDatasetTagManager
                         File.Delete(tagFile);
                         Program.DataManager.Remove(file);
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
 
                     }

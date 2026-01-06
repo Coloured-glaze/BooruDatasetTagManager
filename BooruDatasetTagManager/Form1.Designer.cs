@@ -76,7 +76,7 @@ namespace BooruDatasetTagManager
             MenuShowPreview = new System.Windows.Forms.ToolStripMenuItem();
             MenuItemTranslateTags = new System.Windows.Forms.ToolStripMenuItem();
             MenuShowTagCount = new System.Windows.Forms.ToolStripMenuItem();
-            toolStripSeparator10 = new System.Windows.Forms.ToolStripSeparator();
+            toolStripSeparator11 = new System.Windows.Forms.ToolStripSeparator();
             MenuHideAllTags = new System.Windows.Forms.ToolStripMenuItem();
             MenuHideTags = new System.Windows.Forms.ToolStripMenuItem();
             MenuHideDataset = new System.Windows.Forms.ToolStripMenuItem();
@@ -320,7 +320,7 @@ namespace BooruDatasetTagManager
             // 
             toolStripTags.Dock = System.Windows.Forms.DockStyle.None;
             toolStripTags.ImageScalingSize = new System.Drawing.Size(32, 32);
-            toolStripTags.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { BtnTagAdd, BtnTagDelete, BtnTagUndo, BtnTagRedo, toolStripSeparator1, BtnTagCopy, BtnTagPaste, BtnTagSetToAll, toolStripSeparator2, BtnTagPasteFromClipBoard, BtnTagShow, toolStripSplitButton1, toolStripSeparator4, BtnTagUp, BtnTagDown, toolStripSeparator7, BtnTagImageChecker, toolStripSeparator9, BtnTagFindInAll, toolStripSeparator10 });
+            toolStripTags.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { BtnTagAdd, BtnTagDelete, BtnTagUndo, BtnTagRedo, toolStripSeparator1, BtnTagCopy, BtnTagPaste, BtnTagSetToAll, toolStripSeparator2, BtnTagPasteFromClipBoard, BtnTagShow, toolStripSplitButton1, toolStripSeparator4, BtnTagUp, BtnTagDown, toolStripSeparator7, BtnTagImageChecker, toolStripSeparator9, BtnTagFindInAll, toolStripSeparator11 });
             toolStripTags.Location = new System.Drawing.Point(0, 3);
             toolStripTags.Name = "toolStripTags";
             toolStripTags.Size = new System.Drawing.Size(37, 587);
@@ -576,7 +576,7 @@ namespace BooruDatasetTagManager
             // 
             // viewToolStripMenuItem
             // 
-            viewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { MenuShowPreview, MenuItemTranslateTags, MenuShowTagCount, toolStripSeparator10, MenuHideAllTags, MenuHideTags, MenuHideDataset, toolStripSeparator11 });
+            viewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { MenuShowPreview, MenuItemTranslateTags, MenuShowTagCount, toolStripSeparator11, MenuHideAllTags, MenuHideTags, MenuHideDataset, toolStripSeparator12 });
             viewToolStripMenuItem.Name = "viewToolStripMenuItem";
             viewToolStripMenuItem.Size = new System.Drawing.Size(56, 25);
             viewToolStripMenuItem.Text = "View";
@@ -1759,7 +1759,7 @@ namespace BooruDatasetTagManager
         private System.Windows.Forms.ToolStripMenuItem MenuHideAllTags;
         private System.Windows.Forms.ToolStripMenuItem MenuHideTags;
         private System.Windows.Forms.ToolStripMenuItem MenuHideDataset;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator10;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator12;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator11;
         private System.Windows.Forms.ToolStrip toolStrip3;
         private System.Windows.Forms.ToolStripLabel toolStripLabelWeight;
