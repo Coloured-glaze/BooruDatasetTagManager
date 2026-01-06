@@ -81,7 +81,6 @@ namespace BooruDatasetTagManager
             MenuHideAllTags = new System.Windows.Forms.ToolStripMenuItem();
             MenuHideTags = new System.Windows.Forms.ToolStripMenuItem();
             MenuHideDataset = new System.Windows.Forms.ToolStripMenuItem();
-            toolStripSeparator11 = new System.Windows.Forms.ToolStripSeparator();
             MenuSetting = new System.Windows.Forms.ToolStripMenuItem();
             settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             autoTaggerSettingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -321,7 +320,7 @@ namespace BooruDatasetTagManager
             // 
             toolStripTags.Dock = System.Windows.Forms.DockStyle.None;
             toolStripTags.ImageScalingSize = new System.Drawing.Size(32, 32);
-            toolStripTags.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { BtnTagAdd, BtnTagDelete, BtnTagUndo, BtnTagRedo, toolStripSeparator1, BtnTagCopy, BtnTagPaste, BtnTagSetToAll, toolStripSeparator2, BtnTagPasteFromClipBoard, BtnTagShow, toolStripSplitButton1, toolStripSeparator4, BtnTagUp, BtnTagDown, toolStripSeparator7, BtnTagImageChecker, toolStripSeparator9, BtnTagFindInAll, toolStripSeparator11 });
+            toolStripTags.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { BtnTagAdd, BtnTagDelete, BtnTagUndo, BtnTagRedo, toolStripSeparator1, BtnTagCopy, BtnTagPaste, BtnTagSetToAll, toolStripSeparator2, BtnTagPasteFromClipBoard, BtnTagShow, toolStripSplitButton1, toolStripSeparator4, BtnTagUp, BtnTagDown, toolStripSeparator7, BtnTagImageChecker, toolStripSeparator9, BtnTagFindInAll, toolStripSeparator10 });
             toolStripTags.Location = new System.Drawing.Point(0, 3);
             toolStripTags.Name = "toolStripTags";
             toolStripTags.Size = new System.Drawing.Size(37, 587);
@@ -1753,6 +1752,7 @@ namespace BooruDatasetTagManager
         private System.Windows.Forms.ToolStripButton btnAutoGetTagsDefSet;
         private System.Windows.Forms.ToolStripMenuItem autoTaggerSettingsToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator9;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator10;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparatorMenu10;
         private System.Windows.Forms.ToolStripDropDownButton toolStripSplitButton1;
         private System.Windows.Forms.ToolStripMenuItem BtnMenuGenTagsWithCurrentSettings;
