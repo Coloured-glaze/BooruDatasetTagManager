@@ -23,7 +23,6 @@
     <ApplicationIcon>BDTM.ico</ApplicationIcon>
 	<PublishSingleFile>true</PublishSingleFile>
     <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
-    <SourceRevisionId Condition="'$(SourceRevisionId)' == ''">$(GitCommit)</SourceRevisionId>
     <SourceRevisionId Condition="'$(SourceRevisionId)' == ''">unknown</SourceRevisionId>
   </PropertyGroup>
 

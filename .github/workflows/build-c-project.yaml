@@ -153,6 +153,55 @@ jobs:
             --property:SourceRevisionId=${{ github.sha }} `
             /p:TargetFramework=net8.0-windows
 
+      - name: Check GitCommit metadata in built assembly
+        shell: powershell
+        run: |
+          function Check-GitCommitMetadata {
+              param(
+                  [string]$AssemblyPath,
+                  [string]$ExpectedCommit
+              )
+
+              if (-not (Test-Path $AssemblyPath)) {
+                  Write-Host "[ERROR] Assembly not found at: $AssemblyPath" -ForegroundColor Red
+                  exit 1
+              }
+
+              try {
+                  # 加载程序集
+                  $assembly = [System.Reflection.Assembly]::LoadFrom($AssemblyPath)
+                  
+                  # 获取所有AssemblyMetadataAttribute
+                  $metadataAttributes = $assembly.GetCustomAttributes([System.Reflection.AssemblyMetadataAttribute], $false)
+                  
+                  # 查找GitCommit属性
+                  $gitCommit = $metadataAttributes | Where-Object { $_.Key -eq 'GitCommit' } | Select-Object -First 1
+                  
+                  if ($gitCommit -eq $null) {
+                      Write-Host "[ERROR] GitCommit metadata not found in assembly" -ForegroundColor Red
+                      exit 1
+                  }
+                  
+                  $actualCommit = $gitCommit.Value
+                  Write-Host "[INFO] Expected GitCommit: $ExpectedCommit" -ForegroundColor Blue
+                  Write-Host "[INFO] Actual GitCommit: $actualCommit" -ForegroundColor Blue
+                  
+                  if ($actualCommit -eq $ExpectedCommit) {
+                      Write-Host "[SUCCESS] GitCommit metadata matches expected value!" -ForegroundColor Green
+                      exit 0
+                  } else {
+                      Write-Host "[ERROR] GitCommit metadata mismatch!" -ForegroundColor Red
+                      exit 1
+                  }
+              } catch {
+                  Write-Host "[ERROR] Error checking assembly metadata: $_" -ForegroundColor Red
+                  exit 1
+              }
+          }
+
+          # 运行检查
+          $assemblyPath = "BooruDatasetTagManager\BooruDatasetTagManager\bin\${{ inputs.configuration }}\net8.0-windows\BooruDatasetTagManager.dll"
+          Check-GitCommitMetadata -AssemblyPath $assemblyPath -ExpectedCommit ${{ github.sha }}
 
       - name: Publish application
         shell: powershell
