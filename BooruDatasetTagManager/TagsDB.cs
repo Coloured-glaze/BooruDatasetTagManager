@@ -104,33 +104,36 @@ namespace BooruDatasetTagManager
                 LoadedFiles.Add(fName, hash);
             }
 
-
             string[] lines = ReadAllLines(data, Encoding.UTF8);
             if (!append)
                 ClearDb();
             
-            // 批量处理所有标签以提高性能
-            var newTags = new List<(string tag, int count, bool isAlias, string parent)>();
+            ProcessTxtLines(lines);
+        }
+
+        private void ProcessTxtLines(string[] lines)
+        {
+            var newTags = new List<(string tag, int count, bool isAlias, string parent)>(lines.Length);
+            var tagSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            
             foreach (string item in lines)
             {
                 if (!string.IsNullOrWhiteSpace(item))
                 {
                     string tag = PrepareTag(item.Trim().ToLower());
-                    if (!string.IsNullOrEmpty(tag))
+                    if (!string.IsNullOrEmpty(tag) && tagSet.Add(tag))
                     {
                         newTags.Add((tag, 0, false, null));
                     }
                 }
             }
             
-            // 批量添加标签以减少锁竞争
             ProcessBatchTags(newTags);
         }
 
 
         public void LoadFromCSVFile(string fPath, bool append = true)
         {
-            // 使用更高效的字符串分割替代正则表达式
             byte[] data = File.ReadAllBytes(fPath);
             long hash = Adler32.GenerateHash(data);
             string fName = Path.GetFileName(fPath);
@@ -146,74 +149,93 @@ namespace BooruDatasetTagManager
                 LoadedFiles.Add(fName, hash);
             }
 
-
             string[] lines = ReadAllLines(data, Encoding.UTF8);
             if (!append)
                 Tags.Clear();
                 
-            // 批量处理所有CSV行以提高性能
-            var newTags = new List<(string tag, int count, bool isAlias, string parent)>();
+            ProcessCSVLines(lines);
+        }
+
+        private void ProcessCSVLines(string[] lines)
+        {
+            var newTags = new List<(string tag, int count, bool isAlias, string parent)>(lines.Length * 2);
+            var tagSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             
             foreach (string item in lines)
             {
-                // 使用更高效的字符串解析替代正则表达式
                 var parsed = ParseCSVLine(item);
                 if (parsed != null)
                 {
                     string tagName = parsed.Item1;
                     int count = parsed.Item2;
-                    string[] aliases = ParseAliases(parsed.Item3); // aliases string
+                    string[] aliases = ParseAliases(parsed.Item3);
                     
                     if (!string.IsNullOrEmpty(tagName))
                     {
-                        newTags.Add((PrepareTag(tagName.Trim().ToLower()), count, false, null));
+                        string preparedTag = PrepareTag(tagName.Trim().ToLower());
+                        if (tagSet.Add(preparedTag))
+                        {
+                            newTags.Add((preparedTag, count, false, null));
+                        }
                         
                         foreach (var al in aliases)
                         {
                             if (!string.IsNullOrEmpty(al))
                             {
-                                newTags.Add((PrepareTag(al.Trim().ToLower()), count, true, tagName));
+                                string preparedAlias = PrepareTag(al.Trim().ToLower());
+                                if (tagSet.Add(preparedAlias))
+                                {
+                                    newTags.Add((preparedAlias, count, true, tagName));
+                                }
                             }
                         }
                     }
                 }
             }
             
-            // 批量添加标签以减少锁竞争
             ProcessBatchTags(newTags);
         }
 
-        // 批量处理标签以提高性能
         private void ProcessBatchTags(List<(string tag, int count, bool isAlias, string parent)> newTags)
         {
+            var newHashes = new Dictionary<long, int>(newTags.Count);
+            var newTagItems = new List<TagItem>(newTags.Count);
+            
+            foreach (var (tag, count, isAlias, parent) in newTags)
+            {
+                if (string.IsNullOrWhiteSpace(tag))
+                    continue;
+                    
+                long tagHash = tag.GetHash();
+                
+                if (newHashes.TryGetValue(tagHash, out int existTagIndex))
+                {
+                    newTagItems[existTagIndex].Count += count;
+                }
+                else
+                {
+                    var tagItem = new TagItem();
+                    tagItem.SetTag(tag);
+                    tagItem.Count = count;
+                    tagItem.IsAlias = isAlias;
+                    tagItem.Parent = PrepareTag(parent);
+                    
+                    newHashes.Add(tagHash, newTagItems.Count);
+                    newTagItems.Add(tagItem);
+                }
+            }
+            
             lock (hashes)
             {
-                foreach (var (tag, count, isAlias, parent) in newTags)
+                int startIndex = Tags.Count;
+                foreach (var kvp in newHashes)
                 {
-                    if (string.IsNullOrWhiteSpace(tag))
-                        continue;
-                        
-                    long tagHash = tag.GetHash();
-
-                    // 检查是否已存在
-                    if (hashes.TryGetValue(tagHash, out int existTagIndex))
+                    if (!hashes.ContainsKey(kvp.Key))
                     {
-                        // 如果存在，增加计数
-                        Tags[existTagIndex].Count += count;
-                    }
-                    else
-                    {
-                        // 如果不存在，创建新项
-                        var tagItem = new TagItem();
-                        tagItem.SetTag(tag);
-                        tagItem.Count = count;
-                        tagItem.IsAlias = isAlias;
-                        tagItem.Parent = PrepareTag(parent);
-                        
-                        hashes.Add(tagHash, Tags.Count);
-                        Tags.Add(tagItem);
+                        hashes.Add(kvp.Key, startIndex + kvp.Value);
                     }
                 }
+                Tags.AddRange(newTagItems);
             }
         }
 
@@ -310,8 +332,10 @@ namespace BooruDatasetTagManager
             if (FixTags)
             {
                 tag = tag.Replace('_', ' ');
-                tag = tag.Replace("\\(", "(");
-                tag = tag.Replace("\\)", ")");
+                if (tag.Contains("\\("))
+                    tag = tag.Replace("\\(", "(");
+                if (tag.Contains("\\)"))
+                    tag = tag.Replace("\\)", ")");
             }
             return tag;
         }
@@ -322,19 +346,21 @@ namespace BooruDatasetTagManager
                 return true;
             if (Program.Settings.FixTagsOnSaveLoad != FixTags)
                 return true;
-            FileInfo[] tagFiles = new DirectoryInfo(dirToCheck).GetFiles("*.csv", SearchOption.TopDirectoryOnly).
-                Concat(new DirectoryInfo(dirToCheck).GetFiles("*.txt", SearchOption.TopDirectoryOnly)).ToArray();
+            DirectoryInfo dirInfo = new DirectoryInfo(dirToCheck);
+            FileInfo[] csvFiles = dirInfo.GetFiles("*.csv", SearchOption.TopDirectoryOnly);
+            FileInfo[] txtFiles = dirInfo.GetFiles("*.txt", SearchOption.TopDirectoryOnly);
+            FileInfo[] tagFiles = csvFiles.Concat(txtFiles).ToArray();
+            
             if (tagFiles.Length == 0)
                 return false;
             if (LoadedFiles.Count != tagFiles.Length)
                 return true;
+            
             foreach (var item in tagFiles)
             {
                 byte[] data = File.ReadAllBytes(item.FullName);
                 long hash = Adler32.GenerateHash(data);
-                if (!LoadedFiles.ContainsKey(item.Name))
-                    return true;
-                if(LoadedFiles[item.Name]!=hash) 
+                if (!LoadedFiles.TryGetValue(item.Name, out long existingHash) || existingHash != hash)
                     return true;
             }
             return false;
@@ -344,7 +370,7 @@ namespace BooruDatasetTagManager
         {
             bool onlyManual = Program.Settings.OnlyManualTransInAutocomplete;
             
-            var translationCache = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            var translationCache = new Dictionary<string, string>(transManager.Translations.Count, StringComparer.OrdinalIgnoreCase);
             foreach (var transItem in transManager.Translations)
             {
                 if (!onlyManual || transItem.IsManual == onlyManual)
@@ -353,15 +379,15 @@ namespace BooruDatasetTagManager
                 }
             }
             
-            foreach (var tag in Tags)
+            for (int i = 0; i < Tags.Count; i++)
             {
-                if (translationCache.TryGetValue(tag.Tag, out var translation))
+                if (translationCache.TryGetValue(Tags[i].Tag, out var translation))
                 {
-                    tag.Translation = translation;
+                    Tags[i].Translation = translation;
                 }
                 else
                 {
-                    tag.Translation = null;
+                    Tags[i].Translation = null;
                 }
             }
         }
