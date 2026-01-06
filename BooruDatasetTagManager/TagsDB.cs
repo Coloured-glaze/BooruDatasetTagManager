@@ -17,7 +17,7 @@ namespace BooruDatasetTagManager
         public bool FixTags;
         public List<TagItem> Tags;
         public Dictionary<string, long> LoadedFiles;
-        private Dictionary<long, int> hashes;
+        public Dictionary<long, int> hashes;
         private const int curVersion = 101;
 
         public TagsDB()
@@ -70,13 +70,21 @@ namespace BooruDatasetTagManager
         public void LoadCSVFromDir(string dir)
         {
             FileInfo[] csvFiles = new DirectoryInfo(dir).GetFiles("*.csv", SearchOption.TopDirectoryOnly);
-            Parallel.ForEach(csvFiles, item => LoadFromCSVFile(item.FullName));
+            // 使用顺序处理而不是并行处理以避免CPU占用过高
+            foreach (FileInfo item in csvFiles)
+            {
+                LoadFromCSVFile(item.FullName);
+            }
         }
 
         public void LoadTxtFromDir(string dir)
         {
             FileInfo[] txtFiles = new DirectoryInfo(dir).GetFiles("*.txt", SearchOption.TopDirectoryOnly);
-            Parallel.ForEach(txtFiles, item => LoadFromTxtFile(item.FullName));
+            // 使用顺序处理而不是并行处理以避免CPU占用过高
+            foreach (FileInfo item in txtFiles)
+            {
+                LoadFromTxtFile(item.FullName);
+            }
         }
 
         public void LoadFromTxtFile(string fPath, bool append = true)
@@ -100,20 +108,29 @@ namespace BooruDatasetTagManager
             string[] lines = ReadAllLines(data, Encoding.UTF8);
             if (!append)
                 ClearDb();
-            Parallel.ForEach(lines, item =>
+            
+            // 批量处理所有标签以提高性能
+            var newTags = new List<(string tag, int count, bool isAlias, string parent)>();
+            foreach (string item in lines)
             {
-                lock (Tags)
+                if (!string.IsNullOrWhiteSpace(item))
                 {
-                    AddTag(item, 0);
+                    string tag = PrepareTag(item.Trim().ToLower());
+                    if (!string.IsNullOrEmpty(tag))
+                    {
+                        newTags.Add((tag, 0, false, null));
+                    }
                 }
-            });
+            }
+            
+            // 批量添加标签以减少锁竞争
+            ProcessBatchTags(newTags);
         }
 
 
         public void LoadFromCSVFile(string fPath, bool append = true)
         {
-            Regex r = new Regex("(.*?),(\\d+),(\\d+),(.*)");
-            char[] splitter = { ',' };
+            // 使用更高效的字符串分割替代正则表达式
             byte[] data = File.ReadAllBytes(fPath);
             long hash = Adler32.GenerateHash(data);
             string fName = Path.GetFileName(fPath);
@@ -133,60 +150,157 @@ namespace BooruDatasetTagManager
             string[] lines = ReadAllLines(data, Encoding.UTF8);
             if (!append)
                 Tags.Clear();
-            Parallel.ForEach(lines, item =>
+                
+            // 批量处理所有CSV行以提高性能
+            var newTags = new List<(string tag, int count, bool isAlias, string parent)>();
+            
+            foreach (string item in lines)
             {
-                Match match = r.Match(item);
-                if (match.Success)
+                // 使用更高效的字符串解析替代正则表达式
+                var parsed = ParseCSVLine(item);
+                if (parsed != null)
                 {
-                    string tagName = match.Groups[1].Value;
-                    string[] aliases = match.Groups[4].Value.Replace("\"", "").Split(splitter, StringSplitOptions.RemoveEmptyEntries);
-                    lock (Tags)
+                    string tagName = parsed.Item1;
+                    int count = parsed.Item2;
+                    string[] aliases = ParseAliases(parsed.Item3); // aliases string
+                    
+                    if (!string.IsNullOrEmpty(tagName))
                     {
-                        AddTag(tagName, Convert.ToInt32(match.Groups[3].Value));
+                        newTags.Add((PrepareTag(tagName.Trim().ToLower()), count, false, null));
+                        
                         foreach (var al in aliases)
                         {
-                            AddTag(al, Convert.ToInt32(match.Groups[3].Value), true, tagName);
+                            if (!string.IsNullOrEmpty(al))
+                            {
+                                newTags.Add((PrepareTag(al.Trim().ToLower()), count, true, tagName));
+                            }
                         }
                     }
                 }
-            });
+            }
+            
+            // 批量添加标签以减少锁竞争
+            ProcessBatchTags(newTags);
+        }
+
+        // 批量处理标签以提高性能
+        private void ProcessBatchTags(List<(string tag, int count, bool isAlias, string parent)> newTags)
+        {
+            lock (hashes)
+            {
+                foreach (var (tag, count, isAlias, parent) in newTags)
+                {
+                    if (string.IsNullOrWhiteSpace(tag))
+                        continue;
+                        
+                    long tagHash = tag.GetHash();
+
+                    // 检查是否已存在
+                    if (hashes.TryGetValue(tagHash, out int existTagIndex))
+                    {
+                        // 如果存在，增加计数
+                        Tags[existTagIndex].Count += count;
+                    }
+                    else
+                    {
+                        // 如果不存在，创建新项
+                        var tagItem = new TagItem();
+                        tagItem.SetTag(tag);
+                        tagItem.Count = count;
+                        tagItem.IsAlias = isAlias;
+                        tagItem.Parent = PrepareTag(parent);
+                        
+                        hashes.Add(tagHash, Tags.Count);
+                        Tags.Add(tagItem);
+                    }
+                }
+            }
+        }
+
+        // 更高效的CSV行解析方法
+        private Tuple<string, int, string> ParseCSVLine(string line)
+        {
+            if (string.IsNullOrEmpty(line)) return null;
+            
+            int firstComma = line.IndexOf(',');
+            if (firstComma == -1) return null;
+            
+            string tagName = line.Substring(0, firstComma);
+            
+            int secondComma = FindNextComma(line, firstComma + 1);
+            if (secondComma == -1) return null;
+            
+            string countStr = line.Substring(firstComma + 1, secondComma - firstComma - 1);
+            
+            int thirdComma = FindNextComma(line, secondComma + 1);
+            if (thirdComma == -1) return null;
+            
+            string count2Str = line.Substring(secondComma + 1, thirdComma - secondComma - 1);
+            
+            string aliasesStr = line.Substring(thirdComma + 1);
+            
+            if (!int.TryParse(count2Str, out int count)) return null;
+            
+            return new Tuple<string, int, string>(tagName, count, aliasesStr);
+        }
+
+        private int FindNextComma(string line, int startIndex)
+        {
+            int index = startIndex;
+            bool inQuotes = false;
+            
+            while (index < line.Length)
+            {
+                char c = line[index];
+                
+                if (c == '"')
+                {
+                    inQuotes = !inQuotes;
+                }
+                else if (c == ',' && !inQuotes)
+                {
+                    return index;
+                }
+                
+                index++;
+            }
+            
+            return -1;
+        }
+
+        private string[] ParseAliases(string aliasesStr)
+        {
+            if (string.IsNullOrEmpty(aliasesStr))
+                return new string[0];
+                
+            // 移除首尾的引号（如果有）
+            if (aliasesStr.StartsWith("\"") && aliasesStr.EndsWith("\""))
+            {
+                aliasesStr = aliasesStr.Substring(1, aliasesStr.Length - 2);
+            }
+            
+            if (string.IsNullOrEmpty(aliasesStr))
+                return new string[0];
+                
+            // 分割并清理别名
+            var parts = aliasesStr.Split(',');
+            var result = new List<string>();
+            
+            foreach (var part in parts)
+            {
+                string cleanPart = part.Trim();
+                if (!string.IsNullOrEmpty(cleanPart))
+                {
+                    result.Add(cleanPart);
+                }
+            }
+            
+            return result.ToArray();
         }
 
         public void SortTags()
         {
             Tags.Sort((a, b) => a.Tag.CompareTo(b.Tag));
-        }
-
-        private void AddTag(string tag, int count, bool isAlias = false, string parent = null)
-        {
-            if (string.IsNullOrWhiteSpace(tag))
-                return;
-            tag = PrepareTag(tag);
-            if (Tags.Exists(a => a.Parent == tag))
-                return;
-            tag = tag.Trim().ToLower();
-            long tagHash = tag.GetHash();
-
-            int existTagIndex = -1;
-            TagItem tagItem = null;
-            lock (hashes)
-            {
-                if (hashes.TryGetValue(tagHash, out existTagIndex))
-                {
-                    tagItem = Tags[existTagIndex];
-                    tagItem.Count += count;
-                }
-                else
-                {
-                    tagItem = new TagItem();
-                    tagItem.SetTag(tag);
-                    tagItem.Count = count;
-                    tagItem.IsAlias = isAlias;
-                    tagItem.Parent = PrepareTag(parent);
-                    hashes.Add(tagItem.TagHash, Tags.Count);
-                    Tags.Add(tagItem);
-                }
-            }
         }
 
         private string PrepareTag(string tag)

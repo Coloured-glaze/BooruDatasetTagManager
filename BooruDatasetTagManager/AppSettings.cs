@@ -19,7 +19,6 @@ namespace BooruDatasetTagManager
         public bool OnlyManualTransInAutocomplete { get; set; } = false;
         public bool OfflineTranslationMode { get; set; } = false;
         public string TranslationFilePath { get; set; } = "";
-        public bool ManualTagLoadingMode { get; set; } = true;
         public AutocompleteMode AutocompleteMode { get; set; } = AutocompleteMode.StartWith;
         public AutocompleteSort AutocompleteSort { get; set; } = AutocompleteSort.Alphabetical;
         public bool FixTagsOnSaveLoad { get; set; } = true;
@@ -113,7 +112,6 @@ namespace BooruDatasetTagManager
                 OnlyManualTransInAutocomplete = tempSettings.OnlyManualTransInAutocomplete;
                 OfflineTranslationMode = tempSettings.OfflineTranslationMode;
                 TranslationFilePath = tempSettings.TranslationFilePath;
-                ManualTagLoadingMode = tempSettings.ManualTagLoadingMode;
                 AutocompleteMode = tempSettings.AutocompleteMode;
                 AutocompleteSort = tempSettings.AutocompleteSort;
                 FixTagsOnSaveLoad = tempSettings.FixTagsOnSaveLoad;

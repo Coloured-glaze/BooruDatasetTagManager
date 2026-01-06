@@ -32,7 +32,6 @@ namespace BooruDatasetTagManager
             comboBox1.ValueMember = "Code";
             comboBox1.SelectedValue = Program.Settings.TranslationLanguage;
             checkBoxLoadOnlyManual.Checked = Program.Settings.OnlyManualTransInAutocomplete;
-            checkBoxManualTagLoading.Checked = Program.Settings.ManualTagLoadingMode;
             comboBox2.Items.AddRange(Extensions.GetFriendlyEnumValues<TranslationService>());
             comboBox2.SelectedIndex = Extensions.GetEnumIndexFromValue<TranslationService>(Program.Settings.TransService.ToString());
             comboAutocompMode.Items.AddRange(Extensions.GetFriendlyEnumValues<AutocompleteMode>());
@@ -107,7 +106,6 @@ namespace BooruDatasetTagManager
             //Program.Settings.TransService = (TranslationService)Enum.Parse(typeof(TranslationService), comboBox2.SelectedItem.ToString(), true);
             Program.Settings.TransService = Extensions.GetEnumItemFromFriendlyText<TranslationService>(comboBox2.SelectedItem.ToString());
             Program.Settings.OnlyManualTransInAutocomplete = checkBoxLoadOnlyManual.Checked;
-            Program.Settings.ManualTagLoadingMode = checkBoxManualTagLoading.Checked;
             Program.Settings.AutocompleteMode = Extensions.GetEnumItemFromFriendlyText<AutocompleteMode>(comboAutocompMode.SelectedItem.ToString());
             Program.Settings.AutocompleteSort = Extensions.GetEnumItemFromFriendlyText<AutocompleteSort>(comboAutocompSort.SelectedItem.ToString());
             Program.Settings.FixTagsOnSaveLoad = checkBoxFixOnLoad.Checked;
@@ -240,7 +238,6 @@ namespace BooruDatasetTagManager
             labelTransLang.Text = I18n.GetText("SettingTranslationLang");
             labelTranslService.Text = I18n.GetText("SettingTranslationSrv");
             checkBoxLoadOnlyManual.Text = I18n.GetText("SettingLoadOnlyManualAutocomplete");
-            checkBoxManualTagLoading.Text = I18n.GetText("SettingManualTagLoading");
             checkBoxOfflineMode.Text = I18n.GetText("SettingOfflineMode");
             labelTranslationFile.Text = I18n.GetText("SettingTranslationFile");
             checkBoxCacheImages.Text = I18n.GetText("SettingsCheckBoxCacheImages");

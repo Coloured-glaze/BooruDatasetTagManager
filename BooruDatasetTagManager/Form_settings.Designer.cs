@@ -395,16 +395,6 @@ namespace BooruDatasetTagManager
             LabelTagFont.TabIndex = 0;
             LabelTagFont.Text = "Tags gridview font";
             // 
-            // checkBoxManualTagLoading
-            // 
-            this.checkBoxManualTagLoading.AutoSize = true;
-            this.checkBoxManualTagLoading.Location = new System.Drawing.Point(15, 475);
-            this.checkBoxManualTagLoading.Name = "checkBoxManualTagLoading";
-            this.checkBoxManualTagLoading.Size = new System.Drawing.Size(180, 21);
-            this.checkBoxManualTagLoading.TabIndex = 31;
-            this.checkBoxManualTagLoading.Text = "Manual Tag Loading Mode";
-            this.checkBoxManualTagLoading.UseVisualStyleBackColor = true;
-            // 
             // checkBoxLoadOnlyManual
             // 
             checkBoxLoadOnlyManual.AutoSize = true;
@@ -699,6 +689,7 @@ namespace BooruDatasetTagManager
             // 
             tabTranslations.Controls.Add(checkBoxLoadOnlyManual);
             tabTranslations.Controls.Add(checkBoxOfflineMode);
+            tabTranslations.Controls.Add(checkBoxManualTagLoading);
             tabTranslations.Controls.Add(labelTranslationFile);
             tabTranslations.Controls.Add(textBoxTranslationFile);
             tabTranslations.Controls.Add(buttonBrowseTranslationFile);
@@ -858,7 +849,6 @@ namespace BooruDatasetTagManager
             Controls.Add(SettingFrame);
             Controls.Add(BtnCancel);
             Controls.Add(BtnSave);
-            Controls.Add(checkBoxManualTagLoading);
             Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             Name = "Form_settings";
             StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -897,7 +887,6 @@ namespace BooruDatasetTagManager
         private System.Windows.Forms.Label labelTranslService;
         private System.Windows.Forms.ComboBox comboBox2;
         private System.Windows.Forms.CheckBox checkBoxLoadOnlyManual;
-        private System.Windows.Forms.CheckBox checkBoxManualTagLoading;
         private System.Windows.Forms.CheckBox checkBoxOfflineMode;
         private System.Windows.Forms.Label labelTranslationFile;
         private System.Windows.Forms.TextBox textBoxTranslationFile;
