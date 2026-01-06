@@ -32,6 +32,18 @@
       <_Parameter2>$(SourceRevisionId)</_Parameter2>
     </AssemblyAttribute>
   </ItemGroup>
+
+  <Target Name="GenerateGitCommitMetadata" BeforeTargets="CoreCompile">
+    <PropertyGroup>
+      <GitCommitMetadataFile>$(IntermediateOutputPath)GitCommitMetadata.cs</GitCommitMetadataFile>
+    </PropertyGroup>
+    <WriteLinesToFile File="$(GitCommitMetadataFile)" Lines="using System.Reflection;&#10;[assembly: AssemblyMetadata(&quot;GitCommit&quot;, &quot;$(SourceRevisionId)&quot;)]" Overwrite="true" />
+    <ItemGroup>
+      <Compile Include="$(GitCommitMetadataFile)" />
+    </ItemGroup>
+    <Message Text="Generated GitCommit metadata file: $(GitCommitMetadataFile)" Importance="high" />
+    <Message Text="GitCommit value: $(SourceRevisionId)" Importance="high" />
+  </Target>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0-windows|AnyCPU'">
     <NoWarn>1701;1702;CA1416;NU1701</NoWarn>
   </PropertyGroup>
