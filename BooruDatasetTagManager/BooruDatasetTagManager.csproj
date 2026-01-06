@@ -29,12 +29,19 @@
   <ItemGroup>
   </ItemGroup>
 
-  <Target Name="UpdateGitCommitMetadata" BeforeTargets="CoreCompile">
+  <Target Name="UpdateGitCommitMetadata" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <AssemblyInfoFile>$(ProjectDir)Properties\AssemblyInfo.cs</AssemblyInfoFile>
     </PropertyGroup>
-    <Exec Command="powershell -Command &quot;(Get-Content '$(AssemblyInfoFile)') -replace '\[assembly: AssemblyMetadata\(&quot;GitCommit&quot;, &quot;.*?&quot;\)\]', '[assembly: AssemblyMetadata(&quot;GitCommit&quot;, &quot;$(SourceRevisionId)&quot;)]' | Set-Content '$(AssemblyInfoFile)'&quot;" />
-    <Message Text="Updated GitCommit metadata to: $(SourceRevisionId)" Importance="high" />
+    <Message Text="========================================" Importance="high" />
+    <Message Text="Updating GitCommit Metadata" Importance="high" />
+    <Message Text="AssemblyInfoFile: $(AssemblyInfoFile)" Importance="high" />
+    <Message Text="SourceRevisionId: $(SourceRevisionId)" Importance="high" />
+    <Message Text="========================================" Importance="high" />
+    <Exec Command="powershell -Command &quot;$content = Get-Content '$(AssemblyInfoFile)'; $newContent = $content -replace '\[assembly: AssemblyMetadata\(&quot;GitCommit&quot;, &quot;.*?&quot;\)\]', '[assembly: AssemblyMetadata(&quot;GitCommit&quot;, &quot;$(SourceRevisionId)&quot;)]'; $newContent | Set-Content '$(AssemblyInfoFile)'; Write-Host 'Updated GitCommit to: $(SourceRevisionId)'&quot;" />
+    <Message Text="========================================" Importance="high" />
+    <Message Text="GitCommit metadata updated successfully!" Importance="high" />
+    <Message Text="========================================" Importance="high" />
   </Target>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0-windows|AnyCPU'">
     <NoWarn>1701;1702;CA1416;NU1701</NoWarn>
