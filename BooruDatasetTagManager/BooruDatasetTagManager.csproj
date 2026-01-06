@@ -23,8 +23,16 @@
     <ApplicationIcon>BDTM.ico</ApplicationIcon>
 	<PublishSingleFile>true</PublishSingleFile>
     <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
-    <GitCommit Condition="'$(GitCommit)' == ''">unknown</GitCommit>
   </PropertyGroup>
+
+  <Target Name="GetGitCommit" BeforeTargets="CoreCompile">
+    <PropertyGroup>
+      <GitCommit Condition="'$(GitCommit)' == ''">unknown</GitCommit>
+    </PropertyGroup>
+    <Exec Command="git rev-parse HEAD" ConsoleToMSBuild="true" StandardOutputImportance="low" IgnoreExitCode="true">
+      <Output TaskParameter="ConsoleOutput" PropertyName="GitCommit" />
+    </Exec>
+  </Target>
 
   <ItemGroup>
     <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
