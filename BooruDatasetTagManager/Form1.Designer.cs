@@ -66,7 +66,8 @@ namespace BooruDatasetTagManager
             toolStripSeparator9 = new System.Windows.Forms.ToolStripSeparator();
             BtnTagFindInAll = new System.Windows.Forms.ToolStripButton();
             toolStripSeparator10 = new System.Windows.Forms.ToolStripSeparator();
-            BtnAbout = new System.Windows.Forms.ToolStripButton();
+            toolStripSeparatorMenu10 = new System.Windows.Forms.ToolStripSeparator();
+            BtnAbout = new System.Windows.Forms.ToolStripMenuItem();
             menuStrip1 = new System.Windows.Forms.MenuStrip();
             fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             openFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -576,7 +577,7 @@ namespace BooruDatasetTagManager
             // 
             // viewToolStripMenuItem
             // 
-            viewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { MenuShowPreview, MenuItemTranslateTags, MenuShowTagCount, toolStripSeparator11, MenuHideAllTags, MenuHideTags, MenuHideDataset, toolStripSeparator12 });
+            viewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { MenuShowPreview, MenuItemTranslateTags, MenuShowTagCount, toolStripSeparatorMenu10, toolStripSeparator11, MenuHideAllTags, MenuHideTags, MenuHideDataset, toolStripSeparator12 });
             viewToolStripMenuItem.Name = "viewToolStripMenuItem";
             viewToolStripMenuItem.Size = new System.Drawing.Size(56, 25);
             viewToolStripMenuItem.Text = "View";
@@ -602,10 +603,10 @@ namespace BooruDatasetTagManager
             MenuShowTagCount.Text = "Show tag counts";
             MenuShowTagCount.Click += MenuShowTagCount_Click;
             // 
-            // toolStripSeparator10
+            // toolStripSeparatorMenu10
             // 
-            toolStripSeparator10.Name = "toolStripSeparator10";
-            toolStripSeparator10.Size = new System.Drawing.Size(248, 6);
+            toolStripSeparatorMenu10.Name = "toolStripSeparatorMenu10";
+            toolStripSeparatorMenu10.Size = new System.Drawing.Size(248, 6);
             // 
             // MenuHideAllTags
             // 
@@ -1752,6 +1753,7 @@ namespace BooruDatasetTagManager
         private System.Windows.Forms.ToolStripButton btnAutoGetTagsDefSet;
         private System.Windows.Forms.ToolStripMenuItem autoTaggerSettingsToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator9;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparatorMenu10;
         private System.Windows.Forms.ToolStripDropDownButton toolStripSplitButton1;
         private System.Windows.Forms.ToolStripMenuItem BtnMenuGenTagsWithCurrentSettings;
         private System.Windows.Forms.ToolStripMenuItem BtnMenuGenTagsWithSetWindow;

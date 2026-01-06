@@ -76,6 +76,7 @@ jobs:
       - name: Print commit hash
         run: |
           git rev-parse HEAD
+          echo ${{ github.sha }}
 
       # - name: Clone ScreenLister dependency
       #   run: |
