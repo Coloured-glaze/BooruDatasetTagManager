@@ -17,32 +17,22 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <UseWindowsForms>true</UseWindowsForms>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
     <ApplicationIcon>BDTM.ico</ApplicationIcon>
 	<PublishSingleFile>true</PublishSingleFile>
     <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <SourceRevisionId Condition="'$(SourceRevisionId)' == ''">$(GitCommit)</SourceRevisionId>
+    <SourceRevisionId Condition="'$(SourceRevisionId)' == ''">unknown</SourceRevisionId>
   </PropertyGroup>
 
-  <Target Name="GetGitCommit" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <GitCommit Condition="'$(GitCommit)' == ''">unknown</GitCommit>
-    </PropertyGroup>
-    <Exec Command="git rev-parse HEAD" ConsoleToMSBuild="true" StandardOutputImportance="low" IgnoreExitCode="true">
-      <Output TaskParameter="ConsoleOutput" PropertyName="GitCommit" />
-    </Exec>
-  </Target>
-
-  <Target Name="SetGitCommitMetadata" AfterTargets="GetGitCommit">
-    <ItemGroup>
-      <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
-        <_Parameter1>GitCommit</_Parameter1>
-        <_Parameter2>$(GitCommit)</_Parameter2>
-      </AssemblyAttribute>
-    </ItemGroup>
-  </Target>
-
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>GitCommit</_Parameter1>
+      <_Parameter2>$(SourceRevisionId)</_Parameter2>
+    </AssemblyAttribute>
+  </ItemGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0-windows|AnyCPU'">
     <NoWarn>1701;1702;CA1416;NU1701</NoWarn>
   </PropertyGroup>
