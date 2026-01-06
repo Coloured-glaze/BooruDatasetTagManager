@@ -1784,6 +1784,7 @@ namespace BooruDatasetTagManager
         private System.Windows.Forms.DataGridViewTextBoxColumn CountColumn;
         private System.Windows.Forms.ToolStripMenuItem openImageGridFormToolStripMenuItem;
         private System.Windows.Forms.ToolStripButton BtnTagImageChecker;
+        private System.Windows.Forms.ToolStripButton BtnAbout;
         private System.Windows.Forms.ToolStrip toolStrip5;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator14;
         private ToolStripCustomMenuItem TrackBarRowHeight;
