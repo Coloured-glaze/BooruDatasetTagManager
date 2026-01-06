@@ -36,10 +36,9 @@
   <Target Name="GenerateGitCommitMetadata" BeforeTargets="CoreCompile">
     <PropertyGroup>
       <GitCommitMetadataFile>$(IntermediateOutputPath)GitCommitMetadata.cs</GitCommitMetadataFile>
-      <GitCommitMetadataContent>using System.Reflection;
-[assembly: AssemblyMetadata("GitCommit", "$(SourceRevisionId)")]</GitCommitMetadataContent>
     </PropertyGroup>
-    <WriteLinesToFile File="$(GitCommitMetadataFile)" Lines="$(GitCommitMetadataContent)" Overwrite="true" />
+    <WriteLinesToFile File="$(GitCommitMetadataFile)" Lines="using System.Reflection;" Overwrite="true" />
+    <WriteLinesToFile File="$(GitCommitMetadataFile)" Lines="[assembly: AssemblyMetadata(&quot;GitCommit&quot;, &quot;$(SourceRevisionId)&quot;)]" Overwrite="false" />
     <ItemGroup>
       <Compile Include="$(GitCommitMetadataFile)" />
     </ItemGroup>
