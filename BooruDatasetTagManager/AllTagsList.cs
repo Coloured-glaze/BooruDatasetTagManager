@@ -48,13 +48,14 @@ namespace BooruDatasetTagManager
             if (isTranslating)
                 return;
             isTranslating = true;
-            TranslateAllAsync();
+            // 使用 GetAwaiter().GetResult() 来同步调用异步方法，避免 async void
+            TranslateAllAsync().GetAwaiter().GetResult();
         }
 
         public bool IsFilterByCount() => filterByCount;
 
 
-        public async void TranslateAllAsync()
+        public async Task TranslateAllAsync()
         {
             for (int i = 0; i < tagsList.Count; i++)
             {

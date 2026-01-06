@@ -280,7 +280,7 @@ namespace BooruDatasetTagManager
         }
 
 
-        public static async void CheckForUpdateAsync(string currentVersion)
+        public static async Task CheckForUpdateAsync(string currentVersion)
         {
             string data = null;
             await Task.Run(async () =>

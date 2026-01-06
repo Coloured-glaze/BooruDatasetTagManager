@@ -65,6 +65,8 @@ namespace BooruDatasetTagManager
             BtnTagImageChecker = new System.Windows.Forms.ToolStripButton();
             toolStripSeparator9 = new System.Windows.Forms.ToolStripSeparator();
             BtnTagFindInAll = new System.Windows.Forms.ToolStripButton();
+            toolStripSeparator10 = new System.Windows.Forms.ToolStripSeparator();
+            BtnAbout = new System.Windows.Forms.ToolStripButton();
             menuStrip1 = new System.Windows.Forms.MenuStrip();
             fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             openFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -318,7 +320,7 @@ namespace BooruDatasetTagManager
             // 
             toolStripTags.Dock = System.Windows.Forms.DockStyle.None;
             toolStripTags.ImageScalingSize = new System.Drawing.Size(32, 32);
-            toolStripTags.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { BtnTagAdd, BtnTagDelete, BtnTagUndo, BtnTagRedo, toolStripSeparator1, BtnTagCopy, BtnTagPaste, BtnTagSetToAll, toolStripSeparator2, BtnTagPasteFromClipBoard, BtnTagShow, toolStripSplitButton1, toolStripSeparator4, BtnTagUp, BtnTagDown, toolStripSeparator7, BtnTagImageChecker, toolStripSeparator9, BtnTagFindInAll });
+            toolStripTags.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { BtnTagAdd, BtnTagDelete, BtnTagUndo, BtnTagRedo, toolStripSeparator1, BtnTagCopy, BtnTagPaste, BtnTagSetToAll, toolStripSeparator2, BtnTagPasteFromClipBoard, BtnTagShow, toolStripSplitButton1, toolStripSeparator4, BtnTagUp, BtnTagDown, toolStripSeparator7, BtnTagImageChecker, toolStripSeparator9, BtnTagFindInAll, toolStripSeparator10, BtnAbout });
             toolStripTags.Location = new System.Drawing.Point(0, 3);
             toolStripTags.Name = "toolStripTags";
             toolStripTags.Size = new System.Drawing.Size(37, 587);
@@ -519,6 +521,19 @@ namespace BooruDatasetTagManager
             BtnTagFindInAll.Size = new System.Drawing.Size(35, 36);
             BtnTagFindInAll.Text = "Fing tag in \"All tags\"";
             BtnTagFindInAll.Click += toolStripButton23_Click;
+            // 
+            // toolStripSeparator10
+            // 
+            toolStripSeparator10.Name = "toolStripSeparator10";
+            toolStripSeparator10.Size = new System.Drawing.Size(35, 6);
+            // 
+            // BtnAbout
+            // 
+            BtnAbout.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            BtnAbout.ImageTransparentColor = System.Drawing.Color.Magenta;
+            BtnAbout.Name = "BtnAbout";
+            BtnAbout.Size = new System.Drawing.Size(35, 36);
+            BtnAbout.Click += BtnAbout_Click;
             // 
             // menuStrip1
             // 

@@ -23,7 +23,15 @@
     <ApplicationIcon>BDTM.ico</ApplicationIcon>
 	<PublishSingleFile>true</PublishSingleFile>
     <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <GitCommit Condition="'$(GitCommit)' == ''">unknown</GitCommit>
   </PropertyGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>GitCommit</_Parameter1>
+      <_Parameter2>$(GitCommit)</_Parameter2>
+    </AssemblyAttribute>
+  </ItemGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0-windows|AnyCPU'">
     <NoWarn>1701;1702;CA1416;NU1701</NoWarn>
   </PropertyGroup>

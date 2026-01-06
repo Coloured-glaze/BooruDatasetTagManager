@@ -1449,6 +1449,18 @@ namespace BooruDatasetTagManager
             }
         }
 
+        private void BtnAbout_Click(object sender, EventArgs e)
+        {
+            string gitCommit = System.Reflection.Assembly.GetExecutingAssembly()
+                .GetCustomAttributes(typeof(System.Reflection.AssemblyMetadataAttribute), false)
+                .OfType<System.Reflection.AssemblyMetadataAttribute>()
+                .FirstOrDefault(x => x.Key == "GitCommit")?.Value ?? "unknown";
+            
+            string message = string.Format(I18n.GetText("AboutDialogContent"), gitCommit);
+            string title = I18n.GetText("AboutDialogTitle");
+            MessageBox.Show(message, title, MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
 
 
         private void gridViewTags_KeyPress(object sender, KeyPressEventArgs e)
@@ -1783,6 +1795,7 @@ namespace BooruDatasetTagManager
             BtnTagUp.Text = I18n.GetText("BtnTagUp");
             BtnTagDown.Text = I18n.GetText("BtnTagDown");
             BtnTagFindInAll.Text = I18n.GetText("BtnTagFindInAll");
+            BtnAbout.Text = I18n.GetText("BtnAbout");
             toolStripSplitButton1.Text = I18n.GetText("BtnAutoGenerateTagsRoot");
             btnAutoGetTagsDefSet.Text = I18n.GetText("BtnAutoGetTagsDefSet");
             btnOpenAiAutoGetTagsDefSet.Text = I18n.GetText("BtnOpenAiAutoGetTagsDefSet");

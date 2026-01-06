@@ -1,4 +1,4 @@
-﻿BtnImageExitFilter=退出圖片篩選模式
+BtnImageExitFilter=退出圖片篩選模式
 BtnImageFilter=根據所選標籤篩選圖片
 BtnTagAdd=添加標籤
 BtnTagAddToAll=為所有圖片增加標籤

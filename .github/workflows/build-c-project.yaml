@@ -147,6 +147,7 @@ jobs:
             /p:Configuration=${{ inputs.configuration }} `
             /p:Platform="Any CPU" `
             /p:TargetFramework=net8.0-windows `
+            /p:GitCommit=${{ github.sha }} `
             /t:Build `
             /v:minimal
 

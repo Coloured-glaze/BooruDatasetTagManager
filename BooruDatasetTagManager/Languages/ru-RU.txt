@@ -1,4 +1,4 @@
-﻿BtnImageExitFilter=Сбросить фильтр набора данных
+BtnImageExitFilter=Сбросить фильтр набора данных
 BtnImageFilter=Фильтр в наборе данных
 BtnMenuGenTagsWithCurrentSettings=Сгенерировать теги с текущими настройками (AiApiServer)
 BtnMenuGenTagsWithSetWindow=Сгенерировать теги с открытием окна настроек (AiApiServer)
