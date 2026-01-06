@@ -123,4 +123,22 @@
     <Move SourceFiles="@(NativeDllsToMove)" DestinationFolder="$(PublishDir)\$(NativeDllSubDir)\" />
     <Message Text="Moved native dlls to sub-directory '$(NativeDllSubDir)'" Importance="high" />
   </Target>
+
+  <Target Name="VerifyGitCommitMetadata" AfterTargets="Build;Publish">
+    <PropertyGroup>
+      <AssemblyPath Condition="'$(OutputPath)' != ''">$(OutputPath)$(AssemblyName).dll</AssemblyPath>
+      <AssemblyPath Condition="'$(AssemblyPath)' == '' and '$(PublishDir)' != ''">$(PublishDir)$(AssemblyName).dll</AssemblyPath>
+    </PropertyGroup>
+    <Message Text="========================================" Importance="high" />
+    <Message Text="Verifying Git Commit Metadata" Importance="high" />
+    <Message Text="Assembly Path: $(AssemblyPath)" Importance="high" />
+    <Message Text="SourceRevisionId: $(SourceRevisionId)" Importance="high" />
+    <Message Text="========================================" Importance="high" />
+    <Exec Command="powershell -NoProfile -Command &quot;try { $assembly = [System.Reflection.Assembly]::LoadFrom('$(AssemblyPath)'); $gitCommit = $assembly.GetCustomAttributes([System.Reflection.AssemblyMetadataAttribute], $false) | Where-Object { $_.Key -eq 'GitCommit' } | Select-Object -FirstObject -ExpandProperty Value; Write-Host 'GitCommit metadata found:' $gitCommit; if ($gitCommit -eq 'unknown') { Write-Host 'WARNING: GitCommit is unknown!' -ForegroundColor Yellow; exit 1 } else { Write-Host 'SUCCESS: GitCommit is set correctly!' -ForegroundColor Green; exit 0 } } catch { Write-Host 'ERROR: Failed to read assembly metadata:' $_.Exception.Message -ForegroundColor Red; exit 1 }&quot;" ContinueOnError="true" IgnoreExitCode="true">
+      <Output TaskParameter="ExitCode" PropertyName="GitCommitCheckExitCode" />
+    </Exec>
+    <Message Text="========================================" Importance="high" />
+    <Error Condition="'$(GitCommitCheckExitCode)' != '0'" Text="GitCommit metadata verification failed!" />
+    <Message Condition="'$(GitCommitCheckExitCode)' == '0'" Text="GitCommit metadata verification passed!" Importance="high" />
+  </Target>
 </Project>
