@@ -283,6 +283,10 @@ namespace BooruDatasetTagManager
                 for (int i = 0; i < grid.RowCount; i++)
                 {
                     SetStatus($"{I18n.GetText("SettingTabTranslations")} {i}/{grid.RowCount}");
+                    
+                    // 强制更新UI以确保状态栏显示进度
+                    Application.DoEvents();
+                    
                     grid[transColumnName, i].ReadOnly = true;
                     
                     var tagValue = (string)grid[imageTagsColumn, i].Value;
@@ -299,6 +303,12 @@ namespace BooruDatasetTagManager
                         {
                             grid[transColumnName, i].Value = await Program.TransManager.TranslateAsync(tagValue);
                         }
+                    }
+                    
+                    // 每处理10行更新一次UI，避免过于频繁的更新
+                    if (i % 10 == 0 || i == grid.RowCount - 1)
+                    {
+                        Application.DoEvents();
                     }
                 }
             }
