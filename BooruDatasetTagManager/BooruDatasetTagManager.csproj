@@ -33,6 +33,9 @@
   <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
   <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
   
+  <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+  <GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
+
     <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
     <GitCommit Condition="'$(GitCommit)' == ''">unknown</GitCommit>
   </PropertyGroup>
