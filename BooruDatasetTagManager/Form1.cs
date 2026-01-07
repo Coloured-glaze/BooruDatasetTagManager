@@ -1272,7 +1272,7 @@ namespace BooruDatasetTagManager
                     {
                         if (i != e.RowIndex && (string)gridViewTags[e.ColumnIndex, i].Value == editedValue)
                         {
-                            this.BeginInvoke(new MethodInvoker(() =>
+                            this.BeginInvoke(new System.Windows.Forms.MethodInvoker(() =>
                             {
                                 gridViewTags.Rows.RemoveAt(e.RowIndex);
                             }));
@@ -1289,7 +1289,7 @@ namespace BooruDatasetTagManager
                     if (string.IsNullOrEmpty((string)gridViewTags["Image", e.RowIndex].Value))
                     {
                         MessageBox.Show(I18n.GetText("TipImageNameMustFilled"));
-                        this.BeginInvoke(new MethodInvoker(() =>
+                        this.BeginInvoke(new System.Windows.Forms.MethodInvoker(() =>
                         {
                             gridViewTags.Rows.RemoveAt(e.RowIndex);
                         }));
