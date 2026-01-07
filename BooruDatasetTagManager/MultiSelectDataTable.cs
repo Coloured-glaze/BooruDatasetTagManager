@@ -106,6 +106,7 @@ namespace BooruDatasetTagManager
             }
             
             Dictionary<string, string> translationCache = null;
+            bool isOfflineMode = false;
             if (isTranslateMode)
             {
                 translationCache = new Dictionary<string, string>(Program.TransManager.Translations.Count, StringComparer.OrdinalIgnoreCase);
@@ -113,6 +114,7 @@ namespace BooruDatasetTagManager
                 {
                     translationCache[transItem.Orig] = transItem.Trans;
                 }
+                isOfflineMode = Program.Settings.OfflineTranslationMode;
             }
             
             Columns.Add("Tag", typeof(string));
@@ -140,7 +142,7 @@ namespace BooruDatasetTagManager
                             {
                                 row["Translation"] = existingTranslation;
                             }
-                            else
+                            else if (!isOfflineMode)
                             {
                                 var newTranslation = await Program.TransManager.TranslateAsync(item.Key);
                                 if (!string.IsNullOrEmpty(newTranslation))

@@ -556,6 +556,8 @@ namespace BooruDatasetTagManager
                 translationCache[transItem.Orig] = transItem.Trans;
             }
             
+            bool isOfflineMode = Program.Settings.OfflineTranslationMode;
+            
             isStoreHistory = false;
             for (int i = 0; i < Count; i++)
             {
@@ -566,7 +568,7 @@ namespace BooruDatasetTagManager
                     {
                         eTag.Translation = existingTranslation;
                     }
-                    else
+                    else if (!isOfflineMode)
                     {
                         var newTranslation = await Program.TransManager.TranslateAsync(eTag.Tag);
                         if (!string.IsNullOrEmpty(newTranslation))

@@ -286,6 +286,8 @@ namespace BooruDatasetTagManager
                     translationCache[transItem.Orig] = transItem.Trans;
                 }
                 
+                bool isOfflineMode = Program.Settings.OfflineTranslationMode;
+                
                 for (int i = 0; i < grid.RowCount; i++)
                 {
                     grid[transColumnName, i].ReadOnly = true;
@@ -299,7 +301,7 @@ namespace BooruDatasetTagManager
                         {
                             grid[transColumnName, i].Value = existingTranslation;
                         }
-                        else
+                        else if (!isOfflineMode)
                         {
                             var newTranslation = await Program.TransManager.TranslateAsync(tagValue);
                             if (!string.IsNullOrEmpty(newTranslation))

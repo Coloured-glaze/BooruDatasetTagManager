@@ -63,6 +63,8 @@ namespace BooruDatasetTagManager
                 translationCache[transItem.Orig] = transItem.Trans;
             }
             
+            bool isOfflineMode = Program.Settings.OfflineTranslationMode;
+            
             for (int i = 0; i < tagsList.Count; i++)
             {
                 if (tagsList[i].IsNeedTranslate())
@@ -74,13 +76,17 @@ namespace BooruDatasetTagManager
                         {
                             result = existingTranslation;
                         }
-                        else
+                        else if (!isOfflineMode)
                         {
                             result = await Program.TransManager.TranslateAsync(tagsList[i].Tag);
                             if (!string.IsNullOrEmpty(result))
                             {
                                 translationCache[tagsList[i].Tag] = result;
                             }
+                        }
+                        else
+                        {
+                            result = "";
                         }
                         tagsList[i].SetTranslation(result);
                     }
