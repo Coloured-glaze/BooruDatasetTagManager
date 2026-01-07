@@ -23,6 +23,7 @@
     <ApplicationIcon>BDTM.ico</ApplicationIcon>
 	<PublishSingleFile>true</PublishSingleFile>
     <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 
   </PropertyGroup>
 
