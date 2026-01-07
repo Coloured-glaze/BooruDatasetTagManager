@@ -161,7 +161,7 @@ jobs:
           dotnet publish BooruDatasetTagManager/BooruDatasetTagManager.csproj `
             --configuration ${{ inputs.configuration }} `
             --runtime ${{ inputs.runtime }} `
-            --property:GitCommit=${{ github.sha }} `
+            /p:GitCommit=${{ github.sha }} `
             $selfContained `
             --output publish `
             /p:TargetFramework=net8.0-windows `

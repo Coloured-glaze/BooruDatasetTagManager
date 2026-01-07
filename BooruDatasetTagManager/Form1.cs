@@ -1474,8 +1474,6 @@ namespace BooruDatasetTagManager
             MessageBox.Show(message, title, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-
-
         private void gridViewTags_KeyPress(object sender, KeyPressEventArgs e)
         {
 
