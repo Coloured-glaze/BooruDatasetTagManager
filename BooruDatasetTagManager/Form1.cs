@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -1271,7 +1272,7 @@ namespace BooruDatasetTagManager
                     {
                         if (i != e.RowIndex && (string)gridViewTags[e.ColumnIndex, i].Value == editedValue)
                         {
-                            this.BeginInvoke(new MethodInvoker(() =>
+                            this.BeginInvoke(new System.Windows.Forms.MethodInvoker(() =>
                             {
                                 gridViewTags.Rows.RemoveAt(e.RowIndex);
                             }));
@@ -1288,7 +1289,7 @@ namespace BooruDatasetTagManager
                     if (string.IsNullOrEmpty((string)gridViewTags["Image", e.RowIndex].Value))
                     {
                         MessageBox.Show(I18n.GetText("TipImageNameMustFilled"));
-                        this.BeginInvoke(new MethodInvoker(() =>
+                        this.BeginInvoke(new System.Windows.Forms.MethodInvoker(() =>
                         {
                             gridViewTags.Rows.RemoveAt(e.RowIndex);
                         }));
@@ -1464,10 +1465,9 @@ namespace BooruDatasetTagManager
 
         private void BtnAbout_Click(object sender, EventArgs e)
         {
-            string gitCommit = System.Reflection.Assembly.GetExecutingAssembly()
-                .GetCustomAttributes(typeof(System.Reflection.AssemblyMetadataAttribute), false)
-                .OfType<System.Reflection.AssemblyMetadataAttribute>()
-                .FirstOrDefault(x => x.Key == "GitCommit")?.Value ?? "unknown";
+            string gitCommit = System.Reflection.Assembly.GetEntryAssembly()?
+                .GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>()?
+                .InformationalVersion ?? "unknown";
             
             string message = string.Format(I18n.GetText("AboutDialogContent"), gitCommit);
             string title = I18n.GetText("AboutDialogTitle");

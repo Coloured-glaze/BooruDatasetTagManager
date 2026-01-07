@@ -150,7 +150,7 @@ jobs:
         run: |
           dotnet build BooruDatasetTagManager.sln `
             --configuration ${{ inputs.configuration }} `
-            --property:GitCommit=${{ github.sha }} `
+            --property:SourceRevisionId=${{ github.sha }} `
             /p:TargetFramework=net8.0-windows
 
 
