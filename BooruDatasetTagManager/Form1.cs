@@ -1464,10 +1464,9 @@ namespace BooruDatasetTagManager
 
         private void BtnAbout_Click(object sender, EventArgs e)
         {
-            string gitCommit = System.Reflection.Assembly.GetExecutingAssembly()
-                .GetCustomAttributes(typeof(System.Reflection.AssemblyMetadataAttribute), false)
-                .OfType<System.Reflection.AssemblyMetadataAttribute>()
-                .FirstOrDefault(x => x.Key == "GitCommit")?.Value ?? "unknown";
+            string gitCommit = System.Reflection.Assembly.GetEntryAssembly()?
+                .GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>()?
+                .InformationalVersion ?? "unknown";
             
             string message = string.Format(I18n.GetText("AboutDialogContent"), gitCommit);
             string title = I18n.GetText("AboutDialogTitle");

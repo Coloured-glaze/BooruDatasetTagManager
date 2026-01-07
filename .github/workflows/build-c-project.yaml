@@ -162,6 +162,7 @@ jobs:
             --configuration ${{ inputs.configuration }} `
             --runtime ${{ inputs.runtime }} `
             --property:SourceRevisionId=${{ github.sha }} `
+            --property:InformationalVersion=${{ github.sha }} `
             $selfContained `
             --output publish `
             /p:TargetFramework=net8.0-windows `

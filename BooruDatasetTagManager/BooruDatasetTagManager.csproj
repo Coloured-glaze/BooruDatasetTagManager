@@ -17,32 +17,19 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+
     <UseWindowsForms>true</UseWindowsForms>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
     <ApplicationIcon>BDTM.ico</ApplicationIcon>
 	<PublishSingleFile>true</PublishSingleFile>
     <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
-    <SourceRevisionId Condition="'$(SourceRevisionId)' == ''">unknown</SourceRevisionId>
+
   </PropertyGroup>
 
   <ItemGroup>
   </ItemGroup>
 
-  <Target Name="UpdateGitCommitMetadata" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <AssemblyInfoFile>$(ProjectDir)Properties\AssemblyInfo.cs</AssemblyInfoFile>
-    </PropertyGroup>
-    <Message Text="========================================" Importance="high" />
-    <Message Text="Updating GitCommit Metadata" Importance="high" />
-    <Message Text="AssemblyInfoFile: $(AssemblyInfoFile)" Importance="high" />
-    <Message Text="SourceRevisionId: $(SourceRevisionId)" Importance="high" />
-    <Message Text="========================================" Importance="high" />
-    <Exec Command="powershell -Command &quot;$content = Get-Content '$(AssemblyInfoFile)'; $newContent = $content -replace '\[assembly: AssemblyMetadata\(&quot;GitCommit&quot;, &quot;.*?&quot;\)\]', '[assembly: AssemblyMetadata(&quot;GitCommit&quot;, &quot;$(SourceRevisionId)&quot;)]'; $newContent | Set-Content '$(AssemblyInfoFile)'; Write-Host 'Updated GitCommit to: $(SourceRevisionId)'&quot;" />
-    <Message Text="========================================" Importance="high" />
-    <Message Text="GitCommit metadata updated successfully!" Importance="high" />
-    <Message Text="========================================" Importance="high" />
-  </Target>
+
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0-windows|AnyCPU'">
     <NoWarn>1701;1702;CA1416;NU1701</NoWarn>
   </PropertyGroup>
@@ -135,22 +122,5 @@
     <Message Text="Moved native dlls to sub-directory '$(NativeDllSubDir)'" Importance="high" />
   </Target>
 
-  <Target Name="VerifyGitCommitMetadata" AfterTargets="Build;Publish">
-    <PropertyGroup>
-      <AssemblyPath Condition="'$(OutputPath)' != ''">$(OutputPath)$(AssemblyName).dll</AssemblyPath>
-      <AssemblyPath Condition="'$(AssemblyPath)' == '' and '$(PublishDir)' != ''">$(PublishDir)$(AssemblyName).dll</AssemblyPath>
-      <GitCommitCheckExitCode Condition="'$(SourceRevisionId)' != '' and '$(SourceRevisionId)' != 'unknown'">0</GitCommitCheckExitCode>
-      <GitCommitCheckExitCode Condition="'$(GitCommitCheckExitCode)' == ''">1</GitCommitCheckExitCode>
-    </PropertyGroup>
-    <Message Text="========================================" Importance="high" />
-    <Message Text="Verifying Git Commit Metadata" Importance="high" />
-    <Message Text="Assembly Path: $(AssemblyPath)" Importance="high" />
-    <Message Text="SourceRevisionId: $(SourceRevisionId)" Importance="high" />
-    <Message Text="========================================" Importance="high" />
-    <Message Condition="'$(SourceRevisionId)' != '' and '$(SourceRevisionId)' != 'unknown'" Text="SUCCESS: GitCommit is set correctly to '$(SourceRevisionId)'" Importance="high" />
-    <Message Condition="'$(SourceRevisionId)' == '' or '$(SourceRevisionId)' == 'unknown'" Text="WARNING: GitCommit is unknown or not set!" Importance="high" />
-    <Message Text="========================================" Importance="high" />
-    <Error Condition="'$(GitCommitCheckExitCode)' != '0'" Text="GitCommit metadata verification failed! SourceRevisionId is '$(SourceRevisionId)'" />
-    <Message Condition="'$(GitCommitCheckExitCode)' == '0'" Text="GitCommit metadata verification passed!" Importance="high" />
-  </Target>
+
 </Project>
