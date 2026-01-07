@@ -280,13 +280,14 @@ namespace BooruDatasetTagManager
             SetStatus(I18n.GetText("StatusTranslating"));
             try
             {
+                var translationCache = new Dictionary<string, string>(Program.TransManager.Translations.Count, StringComparer.OrdinalIgnoreCase);
+                foreach (var transItem in Program.TransManager.Translations)
+                {
+                    translationCache[transItem.Orig] = transItem.Trans;
+                }
+                
                 for (int i = 0; i < grid.RowCount; i++)
                 {
-                    SetStatus($"{I18n.GetText("SettingTabTranslations")} {i}/{grid.RowCount}");
-                    
-                    // 强制更新UI以确保状态栏显示进度
-                    Application.DoEvents();
-                    
                     grid[transColumnName, i].ReadOnly = true;
                     
                     var tagValue = (string)grid[imageTagsColumn, i].Value;
@@ -294,20 +295,25 @@ namespace BooruDatasetTagManager
                     
                     if (!string.IsNullOrWhiteSpace(tagValue) && string.IsNullOrWhiteSpace(transValue))
                     {
-                        var existingTranslation = Program.TransManager.GetTranslation(tagValue);
-                        if (!string.IsNullOrEmpty(existingTranslation))
+                        if (translationCache.TryGetValue(tagValue, out var existingTranslation) && !string.IsNullOrEmpty(existingTranslation))
                         {
                             grid[transColumnName, i].Value = existingTranslation;
                         }
                         else
                         {
-                            grid[transColumnName, i].Value = await Program.TransManager.TranslateAsync(tagValue);
+                            var newTranslation = await Program.TransManager.TranslateAsync(tagValue);
+                            if (!string.IsNullOrEmpty(newTranslation))
+                            {
+                                translationCache[tagValue] = newTranslation;
+                            }
+                            grid[transColumnName, i].Value = newTranslation;
                         }
                     }
                     
-                    // 每处理20行更新一次UI，避免过于频繁的更新
+                    // 每处理20行更新一次状态和UI，避免过于频繁的更新
                     if (i % 20 == 0 || i == grid.RowCount - 1)
                     {
+                        SetStatus($"{I18n.GetText("SettingTabTranslations")} {i}/{grid.RowCount}");
                         Application.DoEvents();
                     }
                 }

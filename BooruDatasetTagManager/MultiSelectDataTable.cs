@@ -105,6 +105,16 @@ namespace BooruDatasetTagManager
                 }
             }
             
+            Dictionary<string, string> translationCache = null;
+            if (isTranslateMode)
+            {
+                translationCache = new Dictionary<string, string>(Program.TransManager.Translations.Count, StringComparer.OrdinalIgnoreCase);
+                foreach (var transItem in Program.TransManager.Translations)
+                {
+                    translationCache[transItem.Orig] = transItem.Trans;
+                }
+            }
+            
             Columns.Add("Tag", typeof(string));
             Columns.Add("Image", typeof(string));
             Columns.Add("ImageName", typeof(string));
@@ -126,8 +136,19 @@ namespace BooruDatasetTagManager
                     {
                         if (i == 0)
                         {
-                            var existingTranslation = Program.TransManager.GetTranslation(item.Key);
-                            row["Translation"] = !string.IsNullOrEmpty(existingTranslation) ? existingTranslation : await Program.TransManager.TranslateAsync(item.Key);
+                            if (translationCache.TryGetValue(item.Key, out var existingTranslation) && !string.IsNullOrEmpty(existingTranslation))
+                            {
+                                row["Translation"] = existingTranslation;
+                            }
+                            else
+                            {
+                                var newTranslation = await Program.TransManager.TranslateAsync(item.Key);
+                                if (!string.IsNullOrEmpty(newTranslation))
+                                {
+                                    translationCache[item.Key] = newTranslation;
+                                }
+                                row["Translation"] = newTranslation;
+                            }
                         }
                         else
                         {

@@ -550,20 +550,30 @@ namespace BooruDatasetTagManager
 
         public async Task TranslateAllAsync()
         {
+            var translationCache = new Dictionary<string, string>(Program.TransManager.Translations.Count, StringComparer.OrdinalIgnoreCase);
+            foreach (var transItem in Program.TransManager.Translations)
+            {
+                translationCache[transItem.Orig] = transItem.Trans;
+            }
+            
             isStoreHistory = false;
             for (int i = 0; i < Count; i++)
             {
                 EditableTag eTag = (EditableTag)List[i];
                 if (string.IsNullOrEmpty(eTag.Translation))
                 {
-                    var existingTranslation = Program.TransManager.GetTranslation(eTag.Tag);
-                    if (!string.IsNullOrEmpty(existingTranslation))
+                    if (translationCache.TryGetValue(eTag.Tag, out var existingTranslation) && !string.IsNullOrEmpty(existingTranslation))
                     {
                         eTag.Translation = existingTranslation;
                     }
                     else
                     {
-                        eTag.Translation = await Program.TransManager.TranslateAsync(eTag.Tag);
+                        var newTranslation = await Program.TransManager.TranslateAsync(eTag.Tag);
+                        if (!string.IsNullOrEmpty(newTranslation))
+                        {
+                            translationCache[eTag.Tag] = newTranslation;
+                        }
+                        eTag.Translation = newTranslation;
                     }
                 }
             }

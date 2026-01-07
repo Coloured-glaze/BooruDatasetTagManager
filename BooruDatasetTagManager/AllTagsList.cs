@@ -57,21 +57,30 @@ namespace BooruDatasetTagManager
 
         public async Task TranslateAllAsync()
         {
+            var translationCache = new Dictionary<string, string>(Program.TransManager.Translations.Count, StringComparer.OrdinalIgnoreCase);
+            foreach (var transItem in Program.TransManager.Translations)
+            {
+                translationCache[transItem.Orig] = transItem.Trans;
+            }
+            
             for (int i = 0; i < tagsList.Count; i++)
             {
                 if (tagsList[i].IsNeedTranslate())
                 {
                     if (!string.IsNullOrEmpty(tagsList[i].Tag))
                     {
-                        var existingTranslation = Program.TransManager.GetTranslation(tagsList[i].Tag);
                         string result;
-                        if (!string.IsNullOrEmpty(existingTranslation))
+                        if (translationCache.TryGetValue(tagsList[i].Tag, out var existingTranslation) && !string.IsNullOrEmpty(existingTranslation))
                         {
                             result = existingTranslation;
                         }
                         else
                         {
                             result = await Program.TransManager.TranslateAsync(tagsList[i].Tag);
+                            if (!string.IsNullOrEmpty(result))
+                            {
+                                translationCache[tagsList[i].Tag] = result;
+                            }
                         }
                         tagsList[i].SetTranslation(result);
                     }
