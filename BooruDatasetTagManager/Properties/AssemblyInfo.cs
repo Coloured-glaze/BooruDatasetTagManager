@@ -34,4 +34,4 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("2.6.2")]
 [assembly: AssemblyFileVersion("2.6.2.0")]
-[assembly: AssemblyMetadata("GitCommit", "unknown")]
+[assembly: AssemblyInformationalVersion("unknown")]
