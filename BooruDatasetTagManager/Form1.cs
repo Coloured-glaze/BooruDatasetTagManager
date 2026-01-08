@@ -858,7 +858,15 @@ namespace BooruDatasetTagManager
             }
             if (needTranslate)
             {
-                Program.DataManager.AllTags.TranslateAllTags();
+                if (Program.DataManager != null && Program.DataManager.AllTags != null)
+                {
+                    Program.DataManager.AllTags.TranslateAllTags();
+                }
+                if (gridViewAllTags.Columns.Contains("TranslationColumn"))
+                {
+                    gridViewAllTags.Columns["TranslationColumn"].Visible = true;
+                }
+                gridViewAllTags.Refresh();
                 await FillTranslation(gridViewTags);
             }
             else
