@@ -283,6 +283,8 @@ namespace BooruDatasetTagManager
                 
                 bool isOfflineMode = Program.Settings.OfflineTranslationMode;
                 
+                grid.SuspendLayout();
+                
                 for (int i = 0; i < grid.RowCount; i++)
                 {
                     grid[transColumnName, i].ReadOnly = true;
@@ -307,13 +309,14 @@ namespace BooruDatasetTagManager
                         }
                     }
                     
-                    // 每处理20行更新一次状态和UI，避免过于频繁的更新
-                    if (i % 20 == 0 || i == grid.RowCount - 1)
+                    // 每处理 50 行更新一次状态，减少UI更新频率
+                    if (i % 50 == 0 || i == grid.RowCount - 1)
                     {
                         SetStatus($"{I18n.GetText("SettingTabTranslations")} {i}/{grid.RowCount}");
-                        Application.DoEvents();
                     }
                 }
+                
+                grid.ResumeLayout();
             }
             catch (Exception ex)
             {
@@ -855,7 +858,7 @@ namespace BooruDatasetTagManager
             }
             if (needTranslate)
             {
-                await FillTranslation(gridViewAllTags);
+                Program.DataManager.AllTags.TranslateAllTags();
                 await FillTranslation(gridViewTags);
             }
             else
