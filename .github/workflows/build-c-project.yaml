@@ -195,6 +195,9 @@ jobs:
           Get-ChildItem -Path publish -Recurse -File | ForEach-Object {
             Write-Host "  $($_.Name)"
           }
+          
+          # Save archive name to environment variable for later use
+          "ARCHIVE_NAME=$archiveName" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
@@ -208,7 +211,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: release-archive-${{ inputs.configuration }}-${{ inputs.runtime }}
-          path: BooruDatasetTagManager-${{ inputs.configuration }}-${{ inputs.runtime }}.zip
+          path: ${{ env.ARCHIVE_NAME }}
           retention-days: 30
 
   release:
