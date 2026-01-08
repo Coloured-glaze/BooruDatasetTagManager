@@ -63,6 +63,9 @@ namespace BooruDatasetTagManager
             
             SuspendListChanged();
             
+            int totalTags = tagsList.Count;
+            int processedTags = 0;
+            
             for (int i = 0; i < tagsList.Count; i++)
             {
                 if (tagsList[i].IsNeedTranslate())
@@ -92,6 +95,13 @@ namespace BooruDatasetTagManager
                     {
                         tagsList[i].SetTranslation("");
                     }
+                }
+                
+                processedTags++;
+                
+                if (processedTags % 50 == 0 || processedTags == totalTags)
+                {
+                    TranslationProgress?.Invoke(processedTags, totalTags);
                 }
             }
             
@@ -452,6 +462,8 @@ namespace BooruDatasetTagManager
                 onListChanged -= value;
             }
         }
+
+        public event Action<int, int> TranslationProgress;
 
         // Methods.
         object IBindingList.AddNew()

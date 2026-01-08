@@ -35,6 +35,7 @@ namespace BooruDatasetTagManager
         private Dictionary<string, Image> imagesCache;
 
         public event ProgressHandler LoadingProgressChanged;
+        public event ProgressHandler TranslationProgressChanged;
 
         public DatasetManager()
         {
@@ -43,6 +44,10 @@ namespace BooruDatasetTagManager
             AllTags = new AllTagsList();
             AllTagsBindingSource = new BindingSource();
             AllTagsBindingSource.DataSource = AllTags;
+            AllTags.TranslationProgress += (current, total) =>
+            {
+                TranslationProgressChanged?.Invoke(current, total);
+            };
         }
 
         public bool SaveAll()

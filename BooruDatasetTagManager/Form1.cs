@@ -194,6 +194,7 @@ namespace BooruDatasetTagManager
             isLoading = true;
             Program.DataManager = new DatasetManager();
             Program.DataManager.LoadingProgressChanged += DataManager_LoadingProgressChanged;
+            Program.DataManager.TranslationProgressChanged += DataManager_TranslationProgressChanged;
             TrackBarRowHeight.ValueChanged -= TrackBarRowHeight_ValueChanged;
             TrackBarRowHeight.TrackBar.Minimum = 1;
             TrackBarRowHeight.TrackBar.Maximum = Program.Settings.PreviewSize;
@@ -227,6 +228,12 @@ namespace BooruDatasetTagManager
         private void DataManager_LoadingProgressChanged(int current, int max)
         {
             SetStatus($"{LoadingStatusText} ({current}/{max})");
+        }
+
+        private void DataManager_TranslationProgressChanged(int current, int max)
+        {
+            SetStatus($"{I18n.GetText("SettingTabTranslations")} {current}/{max}");
+            Application.DoEvents();
         }
 
         private void TrackBarRowHeight_ValueChanged(object sender, EventArgs e)
