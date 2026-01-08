@@ -313,6 +313,8 @@ namespace BooruDatasetTagManager
                     if (i % 50 == 0 || i == grid.RowCount - 1)
                     {
                         SetStatus($"{I18n.GetText("SettingTabTranslations")} {i}/{grid.RowCount}");
+                        statusLabel.Refresh();
+                        Application.DoEvents();
                     }
                 }
                 
