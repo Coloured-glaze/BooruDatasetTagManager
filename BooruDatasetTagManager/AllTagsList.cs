@@ -61,6 +61,8 @@ namespace BooruDatasetTagManager
             
             bool isOfflineMode = Program.Settings.OfflineTranslationMode;
             
+            SuspendListChanged();
+            
             for (int i = 0; i < tagsList.Count; i++)
             {
                 if (tagsList[i].IsNeedTranslate())
@@ -90,13 +92,11 @@ namespace BooruDatasetTagManager
                     {
                         tagsList[i].SetTranslation("");
                     }
-                    int listIndex = IndexOfInternal(List, tagsList[i]);
-                    if (listIndex != -1)
-                    {
-                        OnListChanged(new ListChangedEventArgs(ListChangedType.ItemChanged, listIndex));
-                    }
                 }
             }
+            
+            ResumeListChanged();
+            
             isTranslating = false;
         }
 

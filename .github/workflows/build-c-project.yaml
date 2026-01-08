@@ -182,7 +182,8 @@ jobs:
         run: |
           $config = "${{ inputs.configuration }}"
           $runtime = "${{ inputs.runtime }}"
-          $archiveName = "BooruDatasetTagManager-${config}-${runtime}.zip"
+          $release_tag = "${{ inputs.release_tag }}"
+          $archiveName = "BooruDatasetTagManager-${release_tag}-${config}-${runtime}.zip"
           
           Write-Host "Creating release archive: $archiveName"
           
