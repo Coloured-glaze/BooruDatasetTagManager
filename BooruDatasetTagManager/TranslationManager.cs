@@ -16,6 +16,7 @@ namespace BooruDatasetTagManager
         private string _language;
         private string _workDir;
         public List<TransItem> Translations { get; set; }
+        private Dictionary<string, string> _translationCache;
         private AbstractTranslator translator;
         private string translationFilePath;
         private bool _offlineMode;
@@ -26,6 +27,7 @@ namespace BooruDatasetTagManager
             _language = toLang;
             _workDir = workDir;
             Translations = new List<TransItem>();
+            _translationCache = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             _offlineMode = offlineMode;
             translator = AbstractTranslator.Create(service);
             if (!string.IsNullOrEmpty(customTranslationFile) && File.Exists(customTranslationFile))
@@ -41,6 +43,7 @@ namespace BooruDatasetTagManager
 
         public void LoadTranslations()
         {
+            _translationCache.Clear();
             if (!File.Exists(translationFilePath))
             {
                 var sw = File.CreateText(translationFilePath);
@@ -96,6 +99,7 @@ namespace BooruDatasetTagManager
                 {
                     var newItem = new TransItem(orig, trans, manual, false);
                     Translations.Add(newItem);
+                    _translationCache[orig] = trans;
                 }
             }
         }
@@ -152,6 +156,11 @@ namespace BooruDatasetTagManager
             return res?.Trans;
         }
 
+        public Dictionary<string, string> GetTranslationCache()
+        {
+            return _translationCache;
+        }
+
         public string GetTranslation(string text, bool onlyManual)
         {
             var res = Translations.FirstOrDefault(t => t.Orig.Equals(text, StringComparison.OrdinalIgnoreCase) && (!onlyManual || t.IsManual == onlyManual));
@@ -181,6 +190,7 @@ namespace BooruDatasetTagManager
             File.AppendAllText(translationFilePath, line + "\r\n", Encoding.UTF8);
             var newItem = new TransItem(orig, trans, isManual, false);
             Translations.Add(newItem);
+            _translationCache[orig] = trans;
         }
 
         public async Task AddTranslationAsync(string orig, string trans, bool isManual)
@@ -200,6 +210,7 @@ namespace BooruDatasetTagManager
             sw.Close();
             var newItem = new TransItem(orig, trans, isManual, false);
             Translations.Add(newItem);
+            _translationCache[orig] = trans;
         }
 
         public async Task<string> TranslateAsync(string text)

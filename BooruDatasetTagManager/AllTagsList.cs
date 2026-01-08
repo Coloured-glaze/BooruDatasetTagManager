@@ -57,11 +57,7 @@ namespace BooruDatasetTagManager
 
         public async Task TranslateAllAsync()
         {
-            var translationCache = new Dictionary<string, string>(Program.TransManager.Translations.Count, StringComparer.OrdinalIgnoreCase);
-            foreach (var transItem in Program.TransManager.Translations)
-            {
-                translationCache[transItem.Orig] = transItem.Trans;
-            }
+            var translationCache = Program.TransManager.GetTranslationCache();
             
             bool isOfflineMode = Program.Settings.OfflineTranslationMode;
             

@@ -109,11 +109,7 @@ namespace BooruDatasetTagManager
             bool isOfflineMode = false;
             if (isTranslateMode)
             {
-                translationCache = new Dictionary<string, string>(Program.TransManager.Translations.Count, StringComparer.OrdinalIgnoreCase);
-                foreach (var transItem in Program.TransManager.Translations)
-                {
-                    translationCache[transItem.Orig] = transItem.Trans;
-                }
+                translationCache = Program.TransManager.GetTranslationCache();
                 isOfflineMode = Program.Settings.OfflineTranslationMode;
             }
             
